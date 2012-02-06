@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Daisy Editor</title>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+        <script type="text/javascript" src="jquery-1.5.1.js"></script>
+        
+        <script type="text/javascript" src="daisy-editor.js"></script>
+        <script type="text/javascript" src="measure.js"></script>
+        <script type="text/javascript" src="document.js"></script>
+        <script type="text/javascript" src="render.js"></script>
+        <script type="text/javascript" src="theme/daisy.js"></script>
+        <script type="text/javascript" src="lexer/general_lexer.js"></script>
+        <script type="text/javascript" src="lexer/daisy.js"></script>
+        <script type="text/javascript" src="index.js"></script>
+    	<style type="text/css">
+    		
+    		#e-canvas,#d-canvas{
+    			cursor: text;
+    			margin: 0px;
+    			outline: none;
+    			position: relative;
+    			left: 0px;
+    			top: 0px;
+    		}
+    		
+    		#e-parent,#d-editor{
+    			width: 425px;
+    			height: 378px;
+    			padding: 0px;
+    			border: 1px solid blue;
+    			overflow: hidden;
+    			position: relative;
+    			outline: none;
+    		
+    		}
+    		
+    		#d-client{
+    			overflow: hidden;
+    			position: absolute;
+    			left : 0px;
+    			top : 0px;
+    		}
+    		#e-caret, #d-caret{
+    			position:absolute;
+    			display:block;
+    			width:1px;
+    			background:transparent;
+       			left:0px;
+    			top: 0px;
+    			padding: 0px;
+   				margin:0px;
+    			outline:none;
+    			border:none;
+    			resize:none;
+    		}
+    		#d-rightscroll {
+    			position: absolute;
+    			width: 23px;
+    			height: 300px;
+    			left: 300px;
+    			top: 0px;
+    			overflow-x: hidden;
+    			overflow-y: scroll;
+    		
+    		}
+    		#d-rightscroll-body{
+    			height: 500px;
+    			width: 1px;
+    		}
+    		#d-bottomscroll{
+    			position: absolute;
+    			height: 23px;
+    			width: 400px;
+    			left: 0px;
+    			top: 350px;
+    			overflow-x: scroll;
+    			overflow-y: hidden;
+    		
+    		}
+    		#d-bottomscroll-body{
+    			width: 500px;
+    			height: 1px;
+    		}
+    	</style>
+    </head>
+    <body>
+    	<h2>Hello Daisy. 你好~</h2>
+    	<div style="margin-left:100px;display: none;">
+    		 <div id="e-parent" >
+    		 <!--	<div id="e-right-scroll"> -->
+    		 		<canvas tabindex="0" width="400" height="350" id="e-canvas" ></canvas>
+	       			<input type="text" id="e-caret" />
+    		 <!--	</div> -->
+	       		
+      		 </div>
+    	</div>
+      	<br/>
+      	<div style="margin-left: 100px;display: inline-block;">
+      		<div id="d-editor">
+      			<div id="d-client">
+      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
+      			</div>
+      			<input type="text" id="d-caret" />
+      			<div id="d-rightscroll"><div id="d-rightscroll-body"></div></div>
+      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
+      			
+      		</div>
+      	</div>
+       <div>
+       		<input type="button" value="Text" onclick="do_test();" />
+       </div>
+       <div >
+       	   <textarea rows="3" cols="20" resize="none" id="test">/**
+ 1234456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ
+ * @author  Abraham
+ * @website http://yuhanghome.net
+ * @address software institute, Nanjing University, The People's Republic of China, Earth. Oh Yeah, Oh No, Oh Daisy. Oh Abraham.
+ * @email   abraham1@163.com | abeyuhang@gmail.com
+ * @weibo   http://weibo.com/abeyuhang
+ *
+ * 两个命中注定孤独的人，
+ * 如果无缘走到一起，是上帝想让他们更优秀；
+ * 如果有缘走到一起，不是不再孤独，
+ * 是上帝让他们更加适应孤独。
+ *
+ * 基于HTML5的canvas元素的前端代码编辑器，目标是实现一个前端的notepad++。
+ * This is a source code editor like Notepad++，
+ * but it is written by Javascript，and is based on the Canvas element of HTML5.
+ *
+ * To Daisy, To my love.
+ *
+ */</textarea>
+       </div>
+  <div style="width:300px;height:200px;display: none;overflow: hidden;">
+       	<div style="display: inline-block;height: 500px;width:600px;" >/**<br/>
+ * @author  Abraham<br/>
+ * @website http://yuhanghome.net<br/>
+ * @address software institute, Nanjing University<br/>
+ * @email   abraham1@163.com | abeyuhang@gmail.com<br/>
+ * @weibo   http://weibo.com/abeyuhang<br/>
+ *<br/>
+ * 两个命中注定孤独的人，<br/>
+ * 如果无缘走到一起，是上帝想让他们更优秀；<br/>
+ * 如果有缘走到一起，不是不再孤独，<br/>
+ * 是上帝让他们更加适应孤独。<br/>
+ *<br/>
+ * 基于HTML5的canvas元素的前端代码编辑器，目标是实现一个前端的notepad++。<br/>
+ * This is a source code editor like Notepad++，<br/>
+ * but it is written by Javascript，and is based on the Canvas element of HTML5.<br/>
+ *<br/>
+ * To Daisy, To my love.<br/>
+ *<br/>
+ */    </div>
+       </div>
+    </body>
+</html>
