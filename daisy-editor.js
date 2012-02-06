@@ -76,10 +76,13 @@ if(typeof Daisy==='undefined')
 			_width = _config.width?_config.width:120,
 			_height = _config.height?_config.height:100;
 		
-		
-	
 		this.SCROLL_STEP = 15;
 		this.SCROLL_WIDTH = 23;
+	
+		this.width = _width;
+		this.canvas_width = _width - this.SCROLL_WIDTH;
+		this.height = _height;
+		this.canvas_height = _height -  this.SCROLL_WIDTH;
 		
 		this.read_only = false;
 		
@@ -107,17 +110,24 @@ if(typeof Daisy==='undefined')
 		this.scroll_top	= 0;
 		this.scroll_left = 0;
 		
-		this._setSize(_width,_height);
+		
 		
 		this.doc = new Daisy._Document(this);
 		this.lexer = new _lexer(this);
 		this.render = new Daisy._Render(this);
-		//this.measure = new Daisy._Measure(this);
 		
-		this.canvas.width = this.render.buffer_width;
-		this.canvas.height = this.render.buffer_height;
+		this._setSize();
+		
 		this.caret.style.height = this.render.line_height+"px";
 		this.caret.style.font = this.theme.font;
+		
+		this.palete = {
+			keys : {},
+			values : []
+		}
+		this._createPalete();
+		//$.log(this.palete);
+		this.render.palete = this.palete.values;
 		
 		this.initEvent();
 		
@@ -126,6 +136,19 @@ if(typeof Daisy==='undefined')
 	}
   
 	Daisy._Editor.prototype = {
+		_createPalete: function(){
+			for(var i=0,j=1;i<this.theme.colors.length;i++){
+				var c = this.theme.colors[i];
+				if(c.name==='default'){
+					this.palete.keys['default'] = 0;
+					this.palete.values[0] = c.value;
+				}else{
+					this.palete.keys[c.name] = j;
+					this.palete.values[j] = c.value;
+					j++;
+				}
+			}
+		},
 		_getEventPoint : function(e){
 			var x = 0, y = 0;
 			//$.log(e);
@@ -150,13 +173,10 @@ if(typeof Daisy==='undefined')
 			this.theme.font = font;
 			
 		},
-		_setSize : function(width,height){
-			this.width = width;
-			this.canvas_width = width - this.SCROLL_WIDTH;
-			this.height = height;
-			this.canvas_height = height -  this.SCROLL_WIDTH;
-			this.container.style.width = width+"px";
-			this.container.style.height = height+"px";
+		_setSize : function(){
+			
+			this.container.style.width = this.width+"px";
+			this.container.style.height = this.height+"px";
 			var l = this.canvas_width + "px",
 				r = this.canvas_height + "px";
 			this.right_scroll.style.left = l;
@@ -167,11 +187,14 @@ if(typeof Daisy==='undefined')
 			this.bottom_scroll.scrollLeft = 0;
 			this.client.style.width = this.canvas_width + "px";
 			this.client.style.height = this.canvas_height + "px";
+			this.canvas.width = this.render.buffer_width;
+			this.canvas.height = this.render.buffer_height;
+			this.render.resetContentSize();
 		},
 		resize : function(size){
-			this._setSize(size.width,size.height);
+			//this._setSize();
 			//this.measureText();
-			this.render.paint();
+			//this.render.paint();
 		},
 		_setCaret : function(pos){
 			this.caret_position = pos;

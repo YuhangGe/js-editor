@@ -11,8 +11,9 @@ if(typeof Daisy.Theme === 'undefined')
 		font_size : 16,
 		background : 'white',
 		select_background : 'rgba(0,0,255,0.4)',
-		number: 'red',
-		word: 'green',
-		operator : 'blue'
+		colors:[{name:'default',value:'black'},
+			{name:'number',value:'red'},
+			{name:'word',value:'green'},
+			{name:'operator',value:'blue'}]
 	}
 })(Daisy,Daisy.Theme);

@@ -4,6 +4,8 @@ if( typeof Daisy === 'undefined')
 Daisy._Document = function(editor) {
 	this.editor = editor;
 	this.text_array = [];
+	this.color_array = [];
+	
 	/**
 	 * 当前行数。初始为1，即一个长度为0的空行。
 	 */
@@ -38,21 +40,32 @@ Daisy._Document = function(editor) {
 		ASCII : 4,
 		UNICODE : 5
 	};
-	this.LINE_REG = /(.*)\n/g;
 	
 }
 
 Daisy._Document.prototype = {
+	setColor : function(index,color_name){
+		var c = this.editor.palete.keys[color_name];
+		//$.log(c);
+		if(c!=null)
+			this.color_array[index] = c;
+		else
+			this.color_array[index] = 0;
+	},
 	/*
 	 * 替换文本中的内容，功能和参数含义跟Array.splice函数类似。
 	 * 从start处开始删除length个元素，再把ele添加进去
 	 * 不一样的是，参数ele可以是字符串或单字符，如果是字符串，其中的每个字符都会被添加到text_array
 	 */
 	_splice : function(start, length, ele) {
-		if(ele.length <= 1)
+		if(ele.length <= 1){
 			this.text_array.splice(start, length, ele);
-		else
+			this.color_array.splice(start,length,-1);
+		}
+		else{
 			this.text_array.splice.apply(this.text_array, [start, length].concat(ele.split("")));
+			//this.color_array.splice.apply(this.color_array,[start,length].concat())
+		}
 	},
 	/**
 	 * 替换当前游标所在位置的字符。
@@ -93,15 +106,15 @@ Daisy._Document.prototype = {
 		cur_line.width+=n_w;
 		cur_line.length++;
 		if(cur_line.width>pre_max_width){
-			//$.log(cur_line.width);
-			this.editor.render.setContentSize(cur_line.width,this.line_number);
 			this.max_width_line = cur_line;
+			this.editor.render.resetContentSize();
 		}else{
-			this.editor.render.resetRegionIndex();
+			this.editor.render.resetRegion();
 		}
 		//$.log(caret);
+		//$.log(chr);
+		this.editor.lexer.lex();
 		
-			
 		return {
 			line:caret.line,
 			colum: caret.colum+1
@@ -148,7 +161,7 @@ Daisy._Document.prototype = {
 		if(cur_line===this.max_width_line){
 			this._findMaxWidthLine();
 		}
-		this.editor.render.setContentSize(this.max_width_line.width,this.line_number);
+		this.editor.render.resetContentSize();
 		//$.log(new_line);
 		return{
 			line: caret.line+1,
@@ -197,13 +210,15 @@ Daisy._Document.prototype = {
 			//$.log(lw);
 		}
 		//$.log(this.max_width_line);
-		for(var i=0;i<str.length;i++)
+		for(var i=0;i<str.length;i++){
 			this.text_array.push(str[i]);
-		//this.text_array.concat(str.split(""));
+			this.color_array.push(0);
+		}
 		
 		if(size_change)
-			this.editor.render.setContentSize(this.max_width_line.width,this.line_number);
-		$.log(this.line_number);
+			this.editor.render.resetContentSize();
+		
+		this.editor.lexer.lex();
 	},
 	_delete : function(start, length) {
 		this.text_array.splice(start, length);

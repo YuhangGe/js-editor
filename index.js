@@ -2,7 +2,7 @@ $(function(){
 	d_editor = new Daisy._Editor({
 		width: 400,
 		height: 300,
-		lexer : Daisy.Lexer.Default,
+		lexer : Daisy.Lexer.Daisy,
 		theme : Daisy.Theme.Daisy
 	});
 	var str=$('#test').val();
@@ -13,7 +13,7 @@ $(function(){
 	
 	//d_editor.doc.append_2(s2);
 	//do_test();
-	d_editor.appendText("123\n1234");
+	d_editor.appendText("123\n1234\nhello world a123 23+45+b");
 	//$.log(d_editor.doc.line_info);
 	//for(var i=0;i<10;i++)
 		//d_editor.appendString(str+str+str);

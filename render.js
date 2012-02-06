@@ -7,6 +7,7 @@ if(typeof Daisy==='undefined')
 		this.ctx = editor.ctx;
 		this.theme = editor.theme;
 		this.doc = editor.doc;
+		this.palete = ['black'];
 		//$.log(this.theme);
 		this.lexer = editor.lexer;
 		this.width = editor.canvas_width;
@@ -28,22 +29,21 @@ if(typeof Daisy==='undefined')
 		this.top_page_offset = 0;
 		//$.log(this.buffer_height);
 		//$.log(this.line_height);
+		this.ctx.font = this.theme.font;
+		this.line_height = this._getLineHeight();
+		
 		this.region = {
 			left : 0,
 			top : 0,
 			right : this.buffer_width,
 			bottom : this.buffer_height,
-			start_line : 0,
-			start_index : 0,
-			end_line : Math.floor(this.buffer_height/this.line_height),
-			end_index : 0,
 			width : this.buffer_width,
-			height : this.buffer_height
+			height : this.buffer_height,
+			start_line : -1,
+			end_line : -1
 		};
-		
-		this.ctx.font = this.theme.font;
-		this.line_height = this._getLineHeight();
-		
+		this.resetRegion();
+	
 	};
 	Daisy._Render.prototype = {
 		_getLineHeight : function() {
@@ -58,26 +58,13 @@ if(typeof Daisy==='undefined')
 			document.body.removeChild(ele);
 			return h;
 		},
-		_getStartIndex : function(start_line,end_line){
-			var lines = this.doc.line_info,
-				len= lines.length,
-				ls = len>start_line?start_line:len;
-			return  lines[ls].start+1;
-		},
-		_getEndIndex : function(end_line){
-			var lines = this.doc.line_info,
-				len= lines.length,
-				le = len>end_line?end_line:len-1;
-			//$.log(le);
-			//$.log(lines)
-			//$.log(lines.length);
-			return lines[le].start+lines[le].length;
-		},
 		getTextWidth : function(text){
 			return this.ctx.measureText(text).width;
 		},
-		setContentSize : function(c_width,c_line){
-			var c_height = c_line * this.line_height;
+		resetContentSize : function(){
+			$.log('cs')
+			var c_height = this.doc.line_number * this.line_height,
+				c_width = this.doc.max_width_line.width;
 			
 			this.content_width  = c_width>this.width?c_width:this.width;
 			this.content_height = c_height>this.canvas_height?c_height:this.height;
@@ -86,8 +73,7 @@ if(typeof Daisy==='undefined')
 			this.editor.bottom_scroll_body.style.width = c_width+"px";
 			this.editor.right_scroll_body.style.height = c_height+"px";
 			
-			this.resetRegionIndex();
-			//$.log(c_width+","+c_height);
+			this.resetRegion();
 		},
 		paint : function(){
 			
@@ -95,7 +81,6 @@ if(typeof Daisy==='undefined')
 			this.ctx.clearRect(0,0,this.buffer_width,this.buffer_height);
 			
 			this.ctx.font = this.theme.font;
-			this.ctx.fillStyle = this.theme.color;
 			this.ctx.textAlign = "start";
 			this.ctx.textBaseline ='middle';
 		
@@ -103,80 +88,52 @@ if(typeof Daisy==='undefined')
 				//this.renderSelection();
 			
 			//$.log(this.region);	
-			//$.log(this.editor.line_number);
-			//$.log(this.region.line_start);
-			
+
 			
 			var cur_line = this.region.start_line,
 				left = -this.region.left, 
 				top = this.line_height/2-this.region.top+cur_line*this.line_height;
 			
-			//$.log("ls:"+ls+", le:"+le);
-			this.lexer.start();
-			
 			var lex_time = 0;
 			
 			var f_time=new Date().getTime();
 			
-			
-			out_lex: 
-			while(this.lexer.hasMore()){
-				var ff = new Date().getTime();
-				var sr = this.lexer.lex(),
-					i=sr.start+1,e=i+sr.length-1;
-				//$.log(sr);
-				lex_time+=(new Date().getTime()-ff);
+			for(var l=this.region.start_line;l<=this.region.end_line;l++){
+				var line = this.doc.line_info[l];
 				
-				if(e<this.region.start_index || i>this.region.end_index)
-					continue;
-				if(i<this.region.start_index)
-					i=this.region.start_index;
-				if(e>this.region.end_index)
-					e=this.region.end_index;
-				
-				//$.log("i:"+i+",e:"+e)
-				//$.log(sr);
-				/*
-				 * if(sr.style.bold)
-				 * 	...
-				 * todo.
-				 * 
-				 */
-				
-				
-				this.ctx.fillStyle = sr.style.color?sr.style.color:this.theme.color;
-				//$.log(this.ctx.fillStyle);
-				
-				for(;i<=e;i++){
-					
-					var c = this.doc.text_array[i];
-					
-					//$.log(c);
-					if(c === '\n') {
-						top += this.line_height;
-						left =  - this.region.left;
-					} else {
-						var cw = this.ctx.measureText(c).width;
-						if(left +cw >0){
-					 		this.ctx.fillText(c, left, top);
-					 		//if(left>this.region.width){
-					 			//i = this.editor.line_info[]
-							//}
+				for(var i = line.start+1;i<=line.start+line.length;i++){
+					var c = this.doc.color_array[i],t=this.doc.text_array[i];
+					if(c>=0)
+						this.ctx.fillStyle = this.palete[c];
+					else
+						this.ctx.fillStyle = 'black';
+					var cw = this.ctx.measureText(t).width;
+					if(left +cw >0){
+					 	this.ctx.fillText(t, left, top);
+					 	if(left>this.region.width){
+					 		break;
 						}
-						left += cw;
 					}
+					left += cw;
 				}
+				top+=this.line_height;
+				left = -this.region.left;
+				
 			}
-			
-			//$.log("lex time:"+lex_time);
-			//$.log("paint time: "+(new Date().getTime()-f_time));
+
+			$.log("paint time: "+(new Date().getTime()-f_time));
 		},
-		resetRegionIndex : function(){
-			//$.log(this.region);
-			this.region.start_line = Math.floor(this.region.top / this.line_height);
-			this.region.end_line = Math.floor(this.region.bottom/this.line_height);
-			this.region.start_index = this._getStartIndex(this.region.start_line);
-			this.region.end_index = this._getEndIndex(this.region.end_line);
+		resetRegion : function(){
+			
+			var lines = this.doc.line_info,	len= lines.length,
+				ls = Math.floor(this.region.top / this.line_height),
+				le = Math.floor(this.region.bottom/this.line_height),
+				ls = len>ls?ls:len,
+				le = len>le?le:len-1;
+			
+			this.region.start_line = ls;
+			this.region.end_line = le;
+
 		},
 		scrollLeft : function(value){
 			var page = Math.floor(value / this.page_width);
@@ -198,7 +155,7 @@ if(typeof Daisy==='undefined')
 				this.top_page_size = page;
 				this.region.top = page*this.page_height;
 				this.region.bottom = this.region.top+this.buffer_height;
-				this.resetRegionIndex();
+				this.resetRegion();
 				//$.log("paint top buffer:"+page);
 				
 				this.paint();

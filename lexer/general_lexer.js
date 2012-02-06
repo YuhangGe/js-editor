@@ -23,24 +23,11 @@ if(typeof Daisy.Lexer === 'undefined')
 		this.cur_style_range = null;
 	}
 	L.General.prototype={
-		start : function(){
-			this.source = this.editor.doc.text_array;
-			this.has_more = true;
-		},
-		/**
-		 * 每一次调用，返回一个StyleRange
-		 */
 		lex : function(){
-			/**
-			 * 由于是一个通用高亮词法器，不做任何高亮处理，直接返回整个文本区域。
-			 * 不设置style，则会使用默认的颜色字体设置。
-			 */
-			this.cur_style_range = new D.StyleRange(-1,this.source.length);
-			this.has_more = false;
-			return this.cur_style_range;
-		},
-		hasMore : function(){
-			return this.has_more;
+			this.source = this.editor.doc.text_array;
+			for(var i=0;i<this.source.length;i++){
+				this.editor.doc.setColor(i,'default');
+			}
 		}
 	}	
 })(Daisy,Daisy.Lexer);
