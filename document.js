@@ -113,8 +113,9 @@ Daisy._Document.prototype = {
 		}
 		//$.log(caret);
 		//$.log(chr);
+		//var f_time=new Date().getTime();
 		this.editor.lexer.lex();
-		
+		//$.log("lex time: "+(new Date().getTime()-f_time));
 		return {
 			line:caret.line,
 			colum: caret.colum+1

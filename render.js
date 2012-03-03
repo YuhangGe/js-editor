@@ -62,7 +62,7 @@ if(typeof Daisy==='undefined')
 			return this.ctx.measureText(text).width;
 		},
 		resetContentSize : function(){
-			$.log('cs')
+			//$.log('cs')
 			var c_height = this.doc.line_number * this.line_height,
 				c_width = this.doc.max_width_line.width;
 			
@@ -96,7 +96,7 @@ if(typeof Daisy==='undefined')
 			
 			var lex_time = 0;
 			
-			var f_time=new Date().getTime();
+			//var f_time=new Date().getTime();
 			
 			for(var l=this.region.start_line;l<=this.region.end_line;l++){
 				var line = this.doc.line_info[l];
@@ -121,7 +121,7 @@ if(typeof Daisy==='undefined')
 				
 			}
 
-			$.log("paint time: "+(new Date().getTime()-f_time));
+			//$.log("paint time: "+(new Date().getTime()-f_time));
 		},
 		resetRegion : function(){
 			
