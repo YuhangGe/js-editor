@@ -429,11 +429,8 @@ if( typeof Daisy === 'undefined')
 					delta = -e.detail;
 				}
 				//$.log(delta);
-				delta *= 3;
-				if(delta < 0)
-					me._scrollDown(-delta);
-				else
-					me._scrollUp(delta);
+				me.scrollTop(me.scroll_top - delta*10);
+				
 				if(e.stopPropagation) {
 					e.stopPropagation();
 				} else {
