@@ -62,17 +62,16 @@ if(typeof Daisy==='undefined')
 			return this.ctx.measureText(text).width;
 		},
 		resetContentSize : function(){
-			//$.log('cs')
+			
 			var c_height = this.doc.line_number * this.line_height,
 				c_width = this.doc.max_width_line.width;
-			
+
 			this.content_width  = c_width>this.width?c_width:this.width;
-			this.content_height = c_height>this.canvas_height?c_height:this.height;
+			this.content_height = c_height>this.height?c_height:this.height;
 			this.max_scroll_left = this.content_width - this.width;
 			this.max_scroll_top = this.content_height - this.height;
 			this.editor.bottom_scroll_body.style.width = c_width+"px";
 			this.editor.right_scroll_body.style.height = c_height+"px";
-			
 			this.resetRegion();
 		},
 		paint : function(){

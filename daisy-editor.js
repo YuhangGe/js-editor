@@ -47,7 +47,16 @@ if(typeof Daisy==='undefined')
 			ele.detachEvent('on'+event,handeler);
 		}
 	}
-	
+	$.addWheelEvent = function(ele,handler){
+		if(typeof ele === 'string')
+			ele = $(ele);
+		if(window.addEventListener){
+			ele.addEventListener('mousewheel',handler);
+			ele.addEventListener('DOMMouseScroll',handler);
+		}else{
+			ele.attachEvent('onmousewheel',handler);
+		}
+	}
 
 	
 	/**
@@ -419,6 +428,23 @@ if(typeof Daisy==='undefined')
 					//me._resetCaret();
 				}
 			});
+			
+			$.addWheelEvent(this.canvas,function(e){
+				//e=window.event|e;
+				
+				var delta = 0;
+				if(e.wheelDelta){
+					delta = e.wheelDelta / 120;
+				}else if(e.detail){
+					delta = -e.detail;
+				}
+				//$.log(delta);
+				delta *= 3;
+				if(delta<0)
+					me._scrollDown(-delta);
+				else
+					me._scrollUp(delta);
+			});
 		},
 
 
@@ -455,12 +481,14 @@ if(typeof Daisy==='undefined')
 			this.canvas.style.left = -this.render.left_page_offset + "px";
 		},
 		scrollTop : function(value){
+			//$.log(value+","+this.render.max_scroll_top);
 			if(!value instanceof Number || value<0)
 				value = 0;
 			if(value>this.render.max_scroll_top)
 				value = this.render.max_scroll_top;
 			if(value===this.scroll_top)
 				return;
+			//$.log(value);
 			this._doScrollTop(value);
 		},
 		_doScrollTop : function(value){

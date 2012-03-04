@@ -13,7 +13,7 @@ $(function(){
 	
 	//d_editor.doc.append_2(s2);
 	//do_test();
-	d_editor.appendText("/* love daisy */\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23);// test test\n/*\n test\ntest\n */}\n var a=1234");
+	d_editor.appendText("/* love 葛 daisy */\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23);// test test\n/*\n test\ntest\n */}\n var a=1234");
 	//$.log(d_editor.doc.line_info);
 	//for(var i=0;i<10;i++)
 		//d_editor.appendString(str+str+str);
