@@ -44,13 +44,14 @@ Daisy._Document = function(editor) {
 }
 
 Daisy._Document.prototype = {
-	setColor : function(index,color_name){
+	setColor : function(start,length,color_name){
 		var c = this.editor.palete.keys[color_name];
 		//$.log(c);
-		if(c!=null)
-			this.color_array[index] = c;
-		else
-			this.color_array[index] = 0;
+		if(c==null)
+			c = 0;
+		for(var i=start;i<start+length;i++){
+			this.color_array[i] = c;
+		}
 	},
 	/*
 	 * 替换文本中的内容，功能和参数含义跟Array.splice函数类似。
@@ -190,7 +191,7 @@ Daisy._Document.prototype = {
 			pre_max_width = last_line.width;
 			size_change = true;
 		}
-		$.log(pre_max_width);
+		//$.log(pre_max_width);
 		for(var i=1;i<lines.length;i++){
 			l = lines[i];
 			if(l==="")
@@ -219,7 +220,9 @@ Daisy._Document.prototype = {
 		if(size_change)
 			this.editor.render.resetContentSize();
 		
+		var f_time=new Date().getTime();
 		this.editor.lexer.lex();
+		$.log("lex time: "+(new Date().getTime()-f_time));
 	},
 	_delete : function(start, length) {
 		this.text_array.splice(start, length);

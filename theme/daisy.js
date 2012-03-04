@@ -11,9 +11,14 @@ if(typeof Daisy.Theme === 'undefined')
 		font_size : 16,
 		background : 'white',
 		select_background : 'rgba(0,0,255,0.4)',
-		colors:[{name:'default',value:'black'},
-			{name:'number',value:'red'},
-			{name:'word',value:'green'},
-			{name:'operator',value:'blue'}]
+		colors:[{name:'default',value:'#000000'},
+			{name:'keyword',value:'#000080'},
+			{name:'value',value:'#FF0000'},
+			{name:'comment',value:'#008000'},
+			{name:'object',value:'purple'},
+			{name:'operator',value:'#000080'},
+			{name:'string',value:'#8f9d6a'},
+			{name:'regexp',value:'#8000FF'},
+			{name:'id',value:'#000000'}]
 	}
 })(Daisy,Daisy.Theme);

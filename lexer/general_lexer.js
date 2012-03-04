@@ -25,9 +25,7 @@ if(typeof Daisy.Lexer === 'undefined')
 	L.General.prototype={
 		lex : function(){
 			this.source = this.editor.doc.text_array;
-			for(var i=0;i<this.source.length;i++){
-				this.editor.doc.setColor(i,'default');
-			}
+			this.editor.doc.setColor(0,this.source.length,'default');
 		}
 	}	
 })(Daisy,Daisy.Lexer);
