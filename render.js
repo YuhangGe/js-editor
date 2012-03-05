@@ -7,7 +7,7 @@ if(typeof Daisy==='undefined')
 		this.ctx = editor.ctx;
 		this.theme = editor.theme;
 		this.doc = editor.doc;
-		this.palete = ['black'];
+		this.styles = [];
 		//$.log(this.theme);
 		this.lexer = editor.lexer;
 		this.width = editor.canvas_width;
@@ -58,6 +58,45 @@ if(typeof Daisy==='undefined')
 			document.body.removeChild(ele);
 			return h;
 		},
+		getCharWidth :function(chr,index){
+			var bold = this.styles[this.doc.style_array[index]].bold;
+			this.ctx.font = (bold?'Bold ':'')+this.theme.font;
+			return this.ctx.measureText(chr).width
+		},
+		getTextWidth_2 : function(text,index){
+			if(text.length === 0)
+				return 0;
+			var w = 0,a=0,b=0, pre=false,len = text.length,s=this.doc.style_array[index];
+			pre = this.styles[s].bold;
+			b = 1;
+			var i = 1;
+				while(i<len){
+					s = this.doc.style_array[i+index];
+					
+					if(this.styles[s].bold == pre){
+						b++;
+						
+					}else{
+						w += this._getTextWidth(text.substr(a,b),pre);
+						//$.log(a+","+b);
+						pre = this.styles[s].bold;
+						b = 1;
+						a = i;
+					}
+					i++;
+				}
+
+							w += this._getTextWidth(text.substr(a,b),pre);;
+							//$.log(a+","+b);
+	
+						
+				
+			return w;
+		},
+		_getTextWidth : function(text,bold){
+			this.ctx.font = (bold?'Bold ':'')+this.theme.font;
+			return this.ctx.measureText(text).width
+		},
 		getTextWidth : function(text){
 			return this.ctx.measureText(text).width;
 		},
@@ -76,8 +115,8 @@ if(typeof Daisy==='undefined')
 		},
 		paint : function(){
 			
-			
-			this.ctx.clearRect(0,0,this.buffer_width,this.buffer_height);
+			this.ctx.fillStyle = this.theme.background;
+			this.ctx.fillRect(0,0,this.buffer_width,this.buffer_height);
 			
 			this.ctx.font = this.theme.font;
 			this.ctx.textAlign = "start";
@@ -101,11 +140,15 @@ if(typeof Daisy==='undefined')
 				var line = this.doc.line_info[l];
 				
 				for(var i = line.start+1;i<=line.start+line.length;i++){
-					var c = this.doc.color_array[i],t=this.doc.text_array[i];
-					if(c>=0)
-						this.ctx.fillStyle = this.palete[c];
-					else
-						this.ctx.fillStyle = 'black';
+					var t=this.doc.text_array[i],c = this.doc.style_array[i],s = this.styles[c];
+					if(s.italic||s.bold){
+						this.ctx.font = (s.bold?'Bold ':'')+(s.italic?'Italic ':'')+ this.theme.font;
+					}else{
+						this.ctx.font = this.theme.font;
+					}
+					
+					this.ctx.fillStyle = s.color;
+				
 					var cw = this.ctx.measureText(t).width;
 					if(left +cw >0){
 					 	this.ctx.fillText(t, left, top);

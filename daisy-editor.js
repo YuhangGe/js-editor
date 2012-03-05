@@ -120,14 +120,17 @@ if( typeof Daisy === 'undefined')
 
 		this.caret.style.height = this.render.line_height + "px";
 		this.caret.style.font = this.theme.font;
-
-		this.palete = {
+		this.caret.style.color = this.theme.caret_color;
+		this.right_scroll.style.background = this.theme.background;
+		this.bottom_scroll.style.background = this.theme.background;
+		
+		this.palette = {
 			keys : {},
 			values : []
 		}
-		this._createPalete();
+		this._createPalette();
 		//$.log(this.palete);
-		this.render.palete = this.palete.values;
+		this.render.styles = this.palette.values;
 
 		this.initEvent();
 
@@ -136,17 +139,20 @@ if( typeof Daisy === 'undefined')
 	}
 
 	Daisy._Editor.prototype = {
-		_createPalete : function() {
-			for(var i = 0, j = 1; i < this.theme.colors.length; i++) {
-				var c = this.theme.colors[i];
-				if(c.name === 'default') {
-					this.palete.keys['default'] = 0;
-					this.palete.values[0] = c.value;
+		_createPalette : function() {
+			var j = 1;
+			for(var s in this.theme.styles) {
+				if(s === 'default') {
+					this.palette.keys['default'] = 0;
+					this.palette.values[0] = this.theme.styles[s];
 				} else {
-					this.palete.keys[c.name] = j;
-					this.palete.values[j] = c.value;
+					this.palette.keys[s] = j;
+					this.palette.values[j] = this.theme.styles[s];
 					j++;
 				}
+			}
+			if(this.palette.keys['default']==null){
+				throw "主题缺少默认样式！";
 			}
 		},
 		_getEventPoint : function(e) {
@@ -180,11 +186,11 @@ if( typeof Daisy === 'undefined')
 
 			this.container.style.width = this.width + "px";
 			this.container.style.height = this.height + "px";
-			var l = this.canvas_width + "px", r = this.canvas_height + "px";
-			this.right_scroll.style.left = l;
-			this.right_scroll.style.height = r;
-			this.bottom_scroll.style.width = l;
-			this.bottom_scroll.style.top = r;
+			var l = this.canvas_width , r = this.canvas_height ;
+			this.right_scroll.style.left = (l)+"px";
+			this.right_scroll.style.height = (r+2)+"px";
+			this.bottom_scroll.style.width = (l+2)+"px";
+			this.bottom_scroll.style.top = (r)+"px";
 			this.right_scroll.scrollTop = 0;
 			this.bottom_scroll.scrollLeft = 0;
 			this.client.style.width = this.canvas_width + "px";

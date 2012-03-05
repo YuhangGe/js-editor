@@ -102,76 +102,76 @@ if( typeof Daisy.Lexer === 'undefined')
 					}
 				}
 	
-				var yycolor = "default";
+				var yystyle = "default";
 				switch(action) {
 					
 
 					case 2:
-yycolor="object";
+yystyle="object";
 break;
 case 9:
-yycolor="regexp";
+yystyle="regexp";
 break;
 case 5:
-yycolor="comment";
+yystyle="comment";
 break;
 case 6:
-yycolor="comment";this.yygoto(BLOCK_COMMENT);
+yystyle="comment";this.yygoto(BLOCK_COMMENT);
 break;
 case 1:
-yycolor="keyword";
+yystyle="keyword";
 break;
 case 14:
-yycolor="string";this.yygoto(STRING_B);
+yystyle="string";this.yygoto(STRING_B);
 break;
 case 10:
-yycolor="string";this.yygoto(STRING_A);
+yystyle="string";this.yygoto(STRING_A);
 break;
 case 3:
-yycolor="id";
+yystyle="id";
 break;
 case 4:
-yycolor="operator";
+yystyle="operator";
 break;
 case 0:
-yycolor="value";
+yystyle="value";
 break;
 case 18:
-yycolor="default";
+yystyle="default";
 break;
 case 7:
-yycolor="comment";this.yygoto(DEFAULT);
+yystyle="comment";this.yygoto(DEFAULT);
 break;
 case 8:
-yycolor="comment";
+yystyle="comment";
 break;
 case 12:
-yycolor="string";
+yystyle="string";
 break;
 case 11:
-yycolor="string";
+yystyle="string";
 break;
 case 13:
-yycolor="string";this.yygoto(DEFAULT);
+yystyle="string";this.yygoto(DEFAULT);
 break;
 case 16:
-yycolor="string";
+yystyle="string";
 break;
 case 15:
-yycolor="string";
+yystyle="string";
 break;
 case 17:
-yycolor="string";this.yygoto(DEFAULT);
+yystyle="string";this.yygoto(DEFAULT);
 break;
 
 					
 					case L.ACT_TYPE.UNKNOW_CHAR:
 					case L.ACT_TYPE.UNMATCH_CHAR:
 					default :
-						yycolor = "default";
+						yystyle = "default";
 						break;
 				}
-				this.editor.doc.setColor(pre_idx,yylen,yycolor);
+				this.editor.doc.setRangeStyle(pre_idx,yylen,yystyle);
 			}
 			
 		},

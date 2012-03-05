@@ -5,20 +5,28 @@ if(typeof Daisy.Theme === 'undefined')
 	
 (function(D,T){
 	T.Daisy = {
-		color : 'black',
-		font : '18px 宋体',
-		font_name : '宋体',
-		font_size : 16,
-		background : 'white',
+		font : '20px 宋体',
+		background : 'black',
+		caret_color : 'rgba(255,255,255,0.8)',
 		select_background : 'rgba(0,0,255,0.4)',
-		colors:[{name:'default',value:'#000000'},
-			{name:'keyword',value:'#000080'},
+	/*	styles:[{name:'default',value:'white'},
+			{name:'keyword',value:'#cda869'},
 			{name:'value',value:'#FF0000'},
 			{name:'comment',value:'#008000'},
 			{name:'object',value:'purple'},
 			{name:'operator',value:'#000080'},
 			{name:'string',value:'#8f9d6a'},
 			{name:'regexp',value:'#8000FF'},
-			{name:'id',value:'#000000'}]
+			{name:'id',value:'white'}] */
+		styles : {
+			'default' : {color:'white'},
+			'keyword' : {color:'#cda869'},
+			'value' : {color:'red'},
+			'comment' : {color: '#008000', italic : true},
+			'operator': {color: '#000080'},
+			'string' : {color:'#8f9d6a'},
+			'regexp' : {color:'#8000ff',bold:true},
+			'id' : {color:'white'}			
+		}
 	}
 })(Daisy,Daisy.Theme);

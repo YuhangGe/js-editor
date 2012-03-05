@@ -4,7 +4,7 @@ if( typeof Daisy === 'undefined')
 Daisy._Document = function(editor) {
 	this.editor = editor;
 	this.text_array = [];
-	this.color_array = [];
+	this.style_array = [];
 	
 	/**
 	 * 当前行数。初始为1，即一个长度为0的空行。
@@ -44,13 +44,13 @@ Daisy._Document = function(editor) {
 }
 
 Daisy._Document.prototype = {
-	setColor : function(start,length,color_name){
-		var c = this.editor.palete.keys[color_name];
+	setRangeStyle : function(start,length,style_name){
+		var c = this.editor.palette.keys[style_name];
 		//$.log(c);
 		if(c==null)
 			c = 0;
 		for(var i=start;i<start+length;i++){
-			this.color_array[i] = c;
+			this.style_array[i] = c;
 		}
 	},
 	/*
@@ -61,11 +61,10 @@ Daisy._Document.prototype = {
 	_splice : function(start, length, ele) {
 		if(ele.length <= 1){
 			this.text_array.splice(start, length, ele);
-			this.color_array.splice(start,length,-1);
+			this.style_array.splice(start,length,-1);
 		}
 		else{
 			this.text_array.splice.apply(this.text_array, [start, length].concat(ele.split("")));
-			//this.color_array.splice.apply(this.color_array,[start,length].concat())
 		}
 	},
 	/**
@@ -101,8 +100,10 @@ Daisy._Document.prototype = {
 			this.line_info[i].start++;
 			//$.log(this.line_info[i].start);
 		}
+		this.editor.lexer.lex();
+		
 		var cur_line = this.line_info[caret.line],
-			n_w = this.editor.render.getTextWidth(chr),
+			n_w = this.editor.render.getCharWidth(chr,caret.index+1),
 			pre_max_width = this.max_width_line.width;
 		cur_line.width+=n_w;
 		cur_line.length++;
@@ -115,7 +116,7 @@ Daisy._Document.prototype = {
 		//$.log(caret);
 		//$.log(chr);
 		//var f_time=new Date().getTime();
-		this.editor.lexer.lex();
+		
 		//$.log("lex time: "+(new Date().getTime()-f_time));
 		return {
 			line:caret.line,
@@ -126,6 +127,7 @@ Daisy._Document.prototype = {
 	insertLine : function(caret){
 		
 		this.text_array.splice(caret.index+1,0,'\n');
+		this.editor.lexer.lex();
 		
 		var cur_line = this.line_info[caret.line],
 			ls = cur_line.start+1,le=ls+caret.colum,
@@ -143,7 +145,7 @@ Daisy._Document.prototype = {
 			//在一行的中间插入
 			n_s = le+1;
 			var r_str = this.text_array.slice(rs,re).join(""),
-				r_w = this.editor.render.getTextWidth(r_str),
+				r_w = this.editor.render.getTextWidth_2(r_str,rs),
 				l_w = cur_line.width - r_w;
 			n_w = r_w;
 			n_l = re-rs+1;
@@ -173,15 +175,29 @@ Daisy._Document.prototype = {
 	insertText : function(caret){
 		
 	},
+	
 	append : function(str){
+		
+		
+		
 		var last_line = this.line_info[this.line_number-1],
 			lines = str.split("\n"),
 			l = lines[0],size_change=lines.length>1,
-			pre_max_width = this.max_width_line.width;
+			pre_max_width = this.max_width_line.width,
+			start_idx = this.text_array.length;
 		
+		for(var i=0;i<str.length;i++){
+			this.text_array.push(str[i]);
+			this.style_array.push(0);
+		}
+		//var f_time=new Date().getTime();
+		this.editor.lexer.lex();
+		 
+		//$.log("lex time: "+(new Date().getTime()-f_time));
 		
-		
-		var lw = this.editor.render.getTextWidth(l);
+		var lw = this.editor.render.getTextWidth_2(l,start_idx);
+		//var lw2 =  this.editor.render.getTextWidth(l);
+		//$.log(lw+","+lw2);
 		last_line.width+=lw;
 		last_line.length+=l.length;
 		//$.log(last_line);
@@ -192,12 +208,14 @@ Daisy._Document.prototype = {
 			size_change = true;
 		}
 		//$.log(pre_max_width);
+		start_idx += l.length;
 		for(var i=1;i<lines.length;i++){
+			start_idx++; // \n after each line except last line.
+			
 			l = lines[i];
-			if(l==="")
-				lw=0;
-			else
-				lw = this.editor.render.getTextWidth(l);
+			lw = this.editor.render.getTextWidth_2(l,start_idx);//this.editor.render.getTextWidth(l);
+			start_idx+=l.length;
+			//$.log(l+"  :"+lw+" "+start_idx);
 			last_line = {
 				start : last_line.start+last_line.length+1,
 				length: l.length,
@@ -212,17 +230,12 @@ Daisy._Document.prototype = {
 			//$.log(lw);
 		}
 		//$.log(this.max_width_line);
-		for(var i=0;i<str.length;i++){
-			this.text_array.push(str[i]);
-			this.color_array.push(0);
-		}
+		
 		
 		if(size_change)
 			this.editor.render.resetContentSize();
 		
-		var f_time=new Date().getTime();
-		this.editor.lexer.lex();
-		$.log("lex time: "+(new Date().getTime()-f_time));
+		
 	},
 	_delete : function(start, length) {
 		this.text_array.splice(start, length);
@@ -246,7 +259,7 @@ Daisy._Document.prototype = {
 		if(line.length > 0) {
 			var k = line.start + 1, e = k + line.length;
 			for(; k < e; k++) {
-				var cw = this.editor.render.getTextWidth(this.text_array[k]);
+				var cw = this.editor.render.getTextWidth_2(this.text_array[k],k);//this.editor.render.getTextWidth(this.text_array[k]);
 				if(left + cw / 2 > x)
 					break;
 				else
@@ -278,7 +291,7 @@ Daisy._Document.prototype = {
 
 		var l = this.line_info[line], colum = colum === undefined ? l.length : colum + 1, s = this.text_array.slice(l.start + 1, l.start + 1 + colum).join("");
 
-		var left = this.editor.render.getTextWidth(s);
+		var left = this.editor.render.getTextWidth_2(s,l.start+1);
 		return {
 			line : line,
 			colum : colum - 1,
