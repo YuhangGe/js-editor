@@ -101,7 +101,10 @@ if(typeof Daisy==='undefined')
 			return this.ctx.measureText(text).width;
 		},
 		resetContentSize : function(){
-			
+			/**
+			 * 重新设置内容大小。比如当最长的一行长度发生变化，或者行数发生变化时，
+			 * 需要重新设置新的滚动值（scroll_top,scroll_left）等。
+			 */
 			var c_height = this.doc.line_number * this.line_height,
 				c_width = this.doc.max_width_line.width;
 
@@ -111,6 +114,9 @@ if(typeof Daisy==='undefined')
 			this.max_scroll_top = this.content_height - this.height;
 			this.editor.bottom_scroll_body.style.width = c_width+"px";
 			this.editor.right_scroll_body.style.height = c_height+"px";
+			/**
+			 * 还需要设置字符区域的大小。见函数注释.
+			 */
 			this.resetRegion();
 		},
 		paint : function(){
@@ -166,7 +172,10 @@ if(typeof Daisy==='undefined')
 			//$.log("paint time: "+(new Date().getTime()-f_time));
 		},
 		resetRegion : function(){
-			
+			/*
+			 * 设置显示字符区域。通常在document中的内容发生变化（添加删除）后调用。
+			 * 包括重新设置显示的行等信息。
+			 */
 			var lines = this.doc.line_info,	len= lines.length,
 				ls = Math.floor(this.region.top / this.line_height),
 				le = Math.floor(this.region.bottom/this.line_height),

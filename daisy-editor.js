@@ -206,6 +206,7 @@ if( typeof Daisy === 'undefined')
 		},
 		_setCaret : function(pos) {
 			this.caret_position = pos;
+			//$.log(pos);
 			this._resetCaret();
 		},
 		_resetCaret : function() {
@@ -331,7 +332,20 @@ if( typeof Daisy === 'undefined')
 			$.addEvent(this.canvas, 'focus', function(e) {
 				me.focused = true;
 				me.caret.focus();
-
+				if(me.caretTextChange==null){
+					(function(){
+						var pre_text = "";
+						me.caretTextChange = window.setInterval(function() {
+							var cur_text = me.caret.value;
+							if(cur_text !== pre_text) {
+								me.insertText(cur_text);
+								$.log(cur_text);
+								pre_text = "";
+								me.caret.value = "";
+							}
+						}, 300);
+					})();
+				}
 			});
 			$.addEvent(this.caret, 'blur', function(e) {
 				/**
@@ -340,18 +354,12 @@ if( typeof Daisy === 'undefined')
 				 */
 				if(e.explicitOriginalTarget !== me.canvas) {
 					me.focused = false;
+					if(me.caretTextChange!=null){
+						window.clearInterval(me.caretTextChange);
+						me.caretTextChange = null;
+					}
 				}
 			});
-			var pre_text = "";
-			this.flashCaret = window.setInterval(function() {
-				var cur_text = me.caret.value;
-				if(cur_text !== pre_text) {
-					//me.insertText(cur_text);
-					$.log(cur_text);
-					pre_text = "";
-					me.caret.value = "";
-				}
-			}, 300);
 
 			$.addEvent(this.caret, 'keypress', function(e) {
 				//$.log(e);
@@ -366,11 +374,14 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 8:
 						//退格（删除）
-						me.backspace();
+						var new_pos = me.doc.backspace(me.caret_position);
+						me._moveCaret_lc(new_pos.line, new_pos.colum);
+						me.render.paint();
 						break;
 					case 46:
 						//del键
-						me.del();
+						me.doc.del(me.caret_position);
+						me.render.paint();
 						break;
 					case 37:
 						//向左按键
@@ -571,18 +582,14 @@ if( typeof Daisy === 'undefined')
 				return this.CHAR_TYPE.UNICODE;
 		},
 		insertText : function(text) {
-			var f_t = new Date().getTime();
-			var new_pos = this.doc.insert(text, this.caret_position);
-			$.log(new Date().getTime() - f_t);
-			var f_t = new Date().getTime();
-			//this.measure.refresh();
-			//$.log(new Date().getTime()-f_t);
-			//var f_t = new Date().getTime();
-			this.render.paint();
-			$.log(new Date().getTime() - f_t);
-			var f_t = new Date().getTime();
-			this._moveCaret_lc(new_pos.line, new_pos.colum);
-			$.log(new Date().getTime() - f_t);
+			
+			//var new_pos = this.doc.insertText(text, this.caret_position);
+			
+			//this.render.paint();
+			
+			//this._moveCaret_lc(new_pos.line, new_pos.colum);
+			$.log("insert:"+text);
+			
 		},
 		/**
 		 * 选中当前光标所在的单词
@@ -660,30 +667,7 @@ if( typeof Daisy === 'undefined')
 
 			return idx;
 		},
-		/**
-		 * 键盘backspace按键对应的操作
-		 */
-		backspace : function() {
-			var c = this.caret_position, start = c.index, length = 1, line = c.line, colum = c.colum - 1;
-			if(start === -1)
-				return;
-			if(this.select_mode) {
-				var f = this.select_range.from;
-				start = f.index + 1;
-				length = this.select_range.to.index - f.index;
-				line = f.line;
-				colum = f.colum;
-				this.select_mode = false;
-			} else if(c.colum === -1) {
-				line--;
-				colum = this.line_info[line].length - 1;
-			}
-
-			this._delete(start, length);
-			this._moveCaret_lc(line, colum);
-			this.render.paint();
-
-		},
+	
 		/**
 		 * 键盘delete按键对应的操作
 		 */
