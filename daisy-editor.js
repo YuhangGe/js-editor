@@ -20,6 +20,8 @@
 if( typeof Daisy === 'undefined')
 	Daisy = {};
 (function(Daisy) {
+	var $$ = jQuery;
+	
 	var $ = function(id) {
 		return document.getElementById(id);
 	}
@@ -79,7 +81,7 @@ if( typeof Daisy === 'undefined')
 		var _config = config ? config : {}, _lexer = _config.lexer ? _config.lexer : Daisy.Lexer.General, _theme = _config.theme ? _config.theme : Daisy.Theme.General, _width = _config.width ? _config.width : 120, _height = _config.height ? _config.height : 100;
 
 		this.SCROLL_STEP = 15;
-		this.SCROLL_WIDTH = 23;
+		this.SCROLL_WIDTH = 17;
 
 		this.width = _width;
 		this.canvas_width = _width - this.SCROLL_WIDTH;
@@ -89,6 +91,9 @@ if( typeof Daisy === 'undefined')
 		this.read_only = false;
 
 		this.caret = null;
+		/*
+		 * 光标Caret位置的数据结构。
+		 */
 		this.caret_position = {
 			line : 0, //当前光标所在行，从0开始计数
 			colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
@@ -121,8 +126,8 @@ if( typeof Daisy === 'undefined')
 		this.caret.style.height = this.render.line_height + "px";
 		this.caret.style.font = this.theme.font;
 		this.caret.style.color = this.theme.caret_color;
-		this.right_scroll.style.background = this.theme.background;
-		this.bottom_scroll.style.background = this.theme.background;
+		//this.right_scroll.style.background = this.theme.background;
+		//this.bottom_scroll.style.background = this.theme.background;
 		
 		this.palette = {
 			keys : {},
@@ -188,9 +193,11 @@ if( typeof Daisy === 'undefined')
 			this.container.style.height = this.height + "px";
 			var l = this.canvas_width , r = this.canvas_height ;
 			this.right_scroll.style.left = (l)+"px";
-			this.right_scroll.style.height = (r+2)+"px";
-			this.bottom_scroll.style.width = (l+2)+"px";
+			this.right_scroll.style.height = (r)+"px";
+			this.right_scroll.style.width = this.SCROLL_WIDTH + 'px';
+			this.bottom_scroll.style.width = (l)+"px";
 			this.bottom_scroll.style.top = (r)+"px";
+			this.bottom_scroll.style.height = this.SCROLL_WIDTH + 'px';
 			this.right_scroll.scrollTop = 0;
 			this.bottom_scroll.scrollLeft = 0;
 			this.client.style.width = this.canvas_width + "px";
@@ -276,7 +283,8 @@ if( typeof Daisy === 'undefined')
 					return;
 				var need_paint = false;
 
-				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y); out_if:
+				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y); 
+				out_if:
 				if(pos.line !== me.__pre_pos__.line || pos.colum !== me.__pre_pos__.colum) {
 					need_paint = true;
 					var from = me.caret_position, to = pos;
@@ -293,6 +301,7 @@ if( typeof Daisy === 'undefined')
 					}
 					$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
 					me.doc.select(from, to);
+					me.render.paint();
 					me.__pre_pos__ = pos;
 				}
 

@@ -28,6 +28,12 @@ Daisy._Document = function(editor) {
 	this.max_width_line = this.line_info[0];
 
 	this.text = "";
+	/**
+	 * 选中的文字区域。
+	 * from,to都是Caret数据结构。参考daisy-editor.js中this.caret_position注释。
+	 * 由于caret中colum和index属性是指代该位置之前的字符索引，所以from.index所在字符是不包含于选中区域的，
+	 * 而to.index,to.colum所在字符是包含于选中区域中的。
+	 */
 	this.select_range = {
 		from : null,
 		to : null
@@ -180,6 +186,7 @@ Daisy._Document.prototype = {
 		 */
 		for(var i = 0; i < str.length; i++) {
 			this.text_array.push(str[i]);
+			this.style_array.push(0);
 		}
 		//var f_time=new Date().getTime();
 		this.editor.lexer.lex();

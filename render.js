@@ -119,44 +119,85 @@ if(typeof Daisy==='undefined')
 			 */
 			this.resetRegion();
 		},
+		_paintSelect : function(select_range){
+			var f=select_range.from,t=select_range.to,lines=this.doc.line_info,t_arr=this.doc.text_array;
+			var s,s_colum,s_index,e,e_colum,e_index;
+			var left = -this.region.left, 
+				top = this.line_height + cur_line*this.line_height - this.region.top;
+			if(f.line<this.region.start_line){
+				s = this.region.start_line;
+				s_colum = -1;
+				s_index = lines[s].start + 1;//注意line_info中的start代表该行的前一个字符的位置，因此第一个字符的索引要加1
+			}else{
+				s = f.line;
+				s_colum = f.colum;
+				s_index = f.index+1;//f.index加1，因为指代的是之前字符。见document.js中select_range注释
+				//$.log(s_l)
+			}
+			if(t.line>this.region.end_line){
+				e = this.region.end_line;
+				e_colum = lines[e].length;
+				e_index = lines[e].start + lines[e].length+1;//注意line_info中的start代表该行的前一个字符的位置，因此第一个字符的索引要加1
+				
+			}else{
+				e = t.line;
+				e_colum = t.colum;
+				e_index = t.index;//t.colum不要加1，见document.js中select_range注释
+			}
+			
+			this.ctx.fillStyle = this.theme.selection.background;
+			if(s===e){
+				$.dprint("%d %d %d %d",s,s_index,e,e_index);
+				var lt =t_arr.slice(), st = t_arr.slice(s_index,e_index).join("");
+				var left = this.getTextWidth_2()
+				var cw = this.getTextWidth_2(txt,s_index);
+				this.ctx.fillRect();
+			}else{
+				
+				
+			}
+				
+			
+		},
 		paint : function(){
+			var f_time=new Date().getTime();
 			
 			this.ctx.fillStyle = this.theme.background;
 			this.ctx.fillRect(0,0,this.buffer_width,this.buffer_height);
 			
 			this.ctx.font = this.theme.font;
 			this.ctx.textAlign = "start";
-			this.ctx.textBaseline ='middle';
+			this.ctx.textBaseline = 'bottom';//'middle';
 		
-			//if(this.editor.select_mode === true)
-				//this.renderSelection();
-			
+				
 			//$.log(this.region);	
 
 			
 			var cur_line = this.region.start_line,
 				left = -this.region.left, 
-				top = this.line_height/2-this.region.top+cur_line*this.line_height;
+				top = this.line_height + cur_line*this.line_height - this.region.top;
+		
 			
-			var lex_time = 0;
-			
-			//var f_time=new Date().getTime();
-			
+				
 			for(var l=this.region.start_line;l<=this.region.end_line;l++){
 				var line = this.doc.line_info[l];
 				
 				for(var i = line.start+1;i<=line.start+line.length;i++){
 					var t=this.doc.text_array[i],c = this.doc.style_array[i],s = this.styles[c];
 					if(s.italic||s.bold){
-						this.ctx.font = (s.bold?'Bold ':'')+(s.italic?'Italic ':'')+ this.theme.font;
+						this.ctx.font = (s.bold?'bold ':'')+(s.italic?'italic ':'')+ this.theme.font;
 					}else{
 						this.ctx.font = this.theme.font;
 					}
 					
-					this.ctx.fillStyle = s.color;
-				
+					
 					var cw = this.ctx.measureText(t).width;
+					/**
+					 * 只绘制缓冲区region内的字符。
+					 */
 					if(left +cw >0){
+					
+						this.ctx.fillStyle = s.color;
 					 	this.ctx.fillText(t, left, top);
 					 	if(left>this.region.width){
 					 		break;
@@ -169,7 +210,7 @@ if(typeof Daisy==='undefined')
 				
 			}
 
-			//$.log("paint time: "+(new Date().getTime()-f_time));
+			$.log("paint time: "+(new Date().getTime()-f_time));
 		},
 		resetRegion : function(){
 			/*

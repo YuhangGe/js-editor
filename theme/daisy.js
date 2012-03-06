@@ -5,19 +5,12 @@ if(typeof Daisy.Theme === 'undefined')
 	
 (function(D,T){
 	T.Daisy = {
-		font : '20px 宋体',
+		font : '18px consolas',
 		background : 'black',
 		caret_color : 'rgba(255,255,255,0.8)',
-		select_background : 'rgba(0,0,255,0.4)',
-	/*	styles:[{name:'default',value:'white'},
-			{name:'keyword',value:'#cda869'},
-			{name:'value',value:'#FF0000'},
-			{name:'comment',value:'#008000'},
-			{name:'object',value:'purple'},
-			{name:'operator',value:'#000080'},
-			{name:'string',value:'#8f9d6a'},
-			{name:'regexp',value:'#8000FF'},
-			{name:'id',value:'white'}] */
+		selection : {
+			background : 'rgba(200,200,200,0.4)'
+		},
 		styles : {
 			'default' : {color:'white'},
 			'keyword' : {color:'#cda869'},
