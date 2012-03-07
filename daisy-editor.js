@@ -81,7 +81,8 @@ if( typeof Daisy === 'undefined')
 		var _config = config ? config : {}, _lexer = _config.lexer ? _config.lexer : Daisy.Lexer.General, _theme = _config.theme ? _config.theme : Daisy.Theme.General, _width = _config.width ? _config.width : 120, _height = _config.height ? _config.height : 100;
 
 		this.SCROLL_STEP = 15;
-		this.SCROLL_WIDTH = 17;
+		this.SCROLL_WIDTH = 21;
+		this.PADDING_RIGHT = 10;
 
 		this.width = _width;
 		this.canvas_width = _width - this.SCROLL_WIDTH;
