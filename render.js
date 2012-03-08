@@ -119,6 +119,21 @@ if( typeof Daisy === 'undefined')
 			this.region.end_line = le;
 
 		},
+		resetRenderWidth : function(){
+			var c_width = this.doc.max_width_line.width + this.editor.PADDING_RIGHT;
+
+			this.content_width = c_width > this.width ? c_width : this.width;
+			this.max_scroll_left = this.content_width - this.width;
+			this.editor.bottom_scroll_body.style.width = c_width + "px";
+			//$.log(c_width);
+		},
+		resetRenderHeight : function(){
+			var c_height = this.doc.line_number * this.line_height;
+			this.content_height = c_height > this.height ? c_height : this.height;
+			this.max_scroll_top = this.content_height - this.height;
+			this.editor.right_scroll_body.style.height = c_height + "px";
+		
+		},
 		resetContentSize : function() {
 			/**
 			 * 重新设置内容大小。比如当最长的一行长度发生变化，或者行数发生变化时，

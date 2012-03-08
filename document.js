@@ -123,6 +123,7 @@ Daisy._Document.prototype = {
 		for(var i = n_i + 1; i < this.line_number; i++) {
 			this.line_info[i].start++;
 		}
+		this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
 
 		this._doLex([caret.line,n_i]);
@@ -169,7 +170,8 @@ Daisy._Document.prototype = {
 		}
 		
 		this._doLex(ch_l);
-		
+		if(lines.length>1)
+			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
 	},
 	check_width : function(start_line, end_line) {
@@ -189,60 +191,9 @@ Daisy._Document.prototype = {
 		}
 		if(max_change){
 			this._findMaxWidthLine();
-			this.editor.render.resetContentSize();
+			this.editor.render.resetRenderWidth();
 		}
 	},
-/*	append : function(str) {
-
-		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
-		
-		for(var i = 0; i < str.length; i++) {
-			this.text_array.push(str[i]);
-			this.style_array.push(0);
-		}
-		
-		this._doLex();
-
-		var lw = this.editor.render.getTextWidth_2(l, start_idx);
-		last_line.width += lw;
-		last_line.length += l.length;
-		//$.log(last_line);
-		//$.log(this.max_width_line);
-		if(last_line.width > pre_max_width) {
-			this.max_width_line = last_line;
-			pre_max_width = last_line.width;
-			size_change = true;
-		}
-		//$.log(pre_max_width);
-		start_idx += l.length;
-		for(var i = 1; i < lines.length; i++) {
-			start_idx++;
-			// \n after each line except last line.
-
-			l = lines[i];
-			lw = this.editor.render.getTextWidth_2(l, start_idx);
-			//this.editor.render.getTextWidth(l);
-			start_idx += l.length;
-			//$.log(l+"  :"+lw+" "+start_idx);
-			last_line = {
-				start : last_line.start + last_line.length + 1,
-				length : l.length,
-				width : lw
-			}
-			this.line_info.push(last_line);
-			this.line_number++;
-			if(lw > pre_max_width) {
-				this.max_width_line = last_line;
-				pre_max_width = lw;
-			}
-			//$.log(lw);
-		}
-		//$.log(this.max_width_line);
-
-		if(size_change)
-			this.editor.render.resetContentSize();
-
-}, */
 	_deleteChar : function(line, colum) {
 
 		var c_line = this.line_info[line], index = c_line.start + colum + 1;
@@ -266,7 +217,9 @@ Daisy._Document.prototype = {
 			c_line.check_width = true;;
 		
 		}
-		this.editor.render.resetContentSize();
+		if(colum<0)
+			this.editor.render.resetRenderHeight();
+		this.editor.render.resetRegion();
 		
 		this.text_array.splice(index, 1);
 		this.style_array.splice(index, 1);
@@ -285,6 +238,9 @@ Daisy._Document.prototype = {
 		for(var i = t.line + 1; i < this.line_number; i++) {
 			this.line_info[i].start -= len;
 		}
+		/**
+		 * to do...
+		 */
 		this.select_mode = false;
 		return {
 			line : 0,
