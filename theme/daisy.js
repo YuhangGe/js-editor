@@ -11,6 +11,9 @@ if(typeof Daisy.Theme === 'undefined')
 		selection : {
 			background : 'rgba(200,200,200,0.4)'
 		},
+		current_line : {
+			background : 'rgba(200,200,200,0.1)'
+		},
 		styles : {
 			'default' : {color:'white'},
 			'keyword' : {color:'#cda869'},

@@ -69,8 +69,8 @@ if( typeof Daisy === 'undefined')
 		 * 
 		 * 当前的实现不够好，因为不需要传入text这样一个string类型的字符串，还得额外传入index。
 		 * 所有文本都放在了text_array中，直接传入开始到结束的索引就行了。
-		 * 但由于历史原因，以及这样一改动会影响很多地方的代码，暂时没有这样优化。
-		 * 而且目前看到当前实现的效率也可以接受。
+		 * 但由于历史原因，以及这样一改动会影响很多地方的代码，暂时没有这样优化，而且目前看到当前实现的效率也可以接受。
+		 * 但是目前是没有考虑\t字符的实现的，\t会强制转换成4个真实的空格。在下个版本中会重写。
 		 */
 		getTextWidth_2 : function(text, index) {
 			if(text.length === 0)
@@ -178,31 +178,47 @@ if( typeof Daisy === 'undefined')
 	
 			var i_from = line.start + colum_from + 1, i_to = line.start + colum_to + 1;
 			var w_1 = colum_from < 0 ? 0 : this.getTextWidth_2(arr.slice(line.start + 1, i_from+1).join(""), line.start + 1);
-			var w_2 = colum_to === line.length - 1 ? line.width - w_1 : this.getTextWidth_2(arr.slice(i_from, i_to + 1).join(""), i_from);
-
+			var w_2 = colum_to === line.length - 1 ? line.width - w_1 : this.getTextWidth_2(arr.slice(i_from+1, i_to+1 ).join(""), i_from);
+ 			//$.dprint("%d,%d,%d",w_1,w_2,line.width)
+ 			//$.log(arr.slice(i_from, i_to+1 ).join(""))
 			w_2+=cross_line?10:0;	//先暂时只是简单加10，以后再在初始时计算\n字符宽度。
 			/*
 			 * 这个地方没有考虑选择区域的宽度超过了显示区域的大小。因为fillRect会自己处理。
 			 */
 			this.ctx.fillRect(w_1-this.region.left, line_index * this.line_height - this.region.top, w_2, this.line_height);
 		},
+		_paintCurrentLine : function(){
+			var c_l = this.editor.caret_position.line;
+			//$.log(c_l)
+			if(c_l>=this.region.start_line&&c_l<=this.region.end_line){
+				//$.log(c_l);
+				this.ctx.fillStyle = this.theme.current_line.background;
+				this.ctx.fillRect(0,c_l*this.line_height-this.region.top,this.buffer_width,this.line_height);
+			}
+		},
 		paint : function() {
 			var f_time = new Date().getTime();
-
-			this.ctx.fillStyle = this.theme.background;
-			this.ctx.fillRect(0, 0, this.buffer_width, this.buffer_height);
-
 			this.ctx.font = this.theme.font;
 			this.ctx.textAlign = "start";
 			this.ctx.textBaseline = 'bottom';
-			//'middle';
-
-			//$.log(this.region);
-
+			/**
+			 * 绘制整个背景
+			 */
+			this.ctx.fillStyle = this.theme.background;
+			this.ctx.fillRect(0, 0, this.buffer_width, this.buffer_height);
+			/**
+			 * 绘制当前行的背景色
+			 */
+			this._paintCurrentLine();
+			/**
+			 * 绘制文本选中区域的背景色
+			 */
 			if(this.doc.select_mode) {
 				this._paintSelect(this.doc.select_range);
 			}
-
+			/**
+			 * 接下来绘制所有文本。
+			 */
 			var cur_line = this.region.start_line, left = -this.region.left, top = this.line_height + cur_line * this.line_height - this.region.top;
 
 			for(var l = this.region.start_line; l <= this.region.end_line; l++) {
@@ -215,7 +231,12 @@ if( typeof Daisy === 'undefined')
 					} else {
 						this.ctx.font = this.theme.font;
 					}
-
+					/* 
+					 * if(t==="\t")
+						t="    ";
+					 * 当前实现暂时没有考虑\t字符，是在前端（即caret的输入事件）处理，将\t直接硬转换成4个空格。
+					 * 下个版本会重写这个的实现。
+					 */
 					var cw = this.ctx.measureText(t).width;
 					/**
 					 * 只绘制缓冲区region内的字符。

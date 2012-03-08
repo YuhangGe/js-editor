@@ -96,7 +96,7 @@ if( typeof Daisy === 'undefined')
 		 * 光标Caret位置的数据结构。
 		 */
 		this.caret_position = {
-			line : 0, //当前光标所在行，从0开始计数
+			line : -1, //当前光标所在行，从0开始计数
 			colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
 			left : 0, //当前光标所在的相对canvas的left位置坐标
 			top : 0, //当前光标所在的相对canvas的top位置坐标
@@ -253,7 +253,7 @@ if( typeof Daisy === 'undefined')
 				me.__mouse_down__ = true;
 				me.select_mode = false;
 				me.__pre_pos__ = me.caret_position;
-
+				me.__down_pos__ = me.caret_position;
 				if(me.canvas.setCapture)
 					me.canvas.setCapture(true);
 
@@ -282,13 +282,11 @@ if( typeof Daisy === 'undefined')
 			$.addEvent(this.canvas, 'mousemove', function(e) {
 				if(!me.__mouse_down__)
 					return;
-				var need_paint = false;
-
 				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y); 
 				out_if:
 				if(pos.line !== me.__pre_pos__.line || pos.colum !== me.__pre_pos__.colum) {
-					need_paint = true;
-					var from = me.caret_position, to = pos;
+					me._setCaret(pos);
+					var from = me.__down_pos__, to = pos;
 					if(from.line === to.line && from.colum === to.colum && me.select_mode === true) {
 						//me.select_mode = false;
 						$.log("select nothing");
@@ -296,12 +294,13 @@ if( typeof Daisy === 'undefined')
 						break out_if;
 					} else if(from.line > to.line || (from.line === to.line && from.colum > to.colum)) {
 						from = pos;
-						to = me.caret_position;
+						to = me.__down_pos__;
 						//$.log(from);
 						//$.log(to);
 					}
 					$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
 					me.doc.select(from, to);
+					
 					me.render.paint();
 					me.__pre_pos__ = pos;
 				}
@@ -349,11 +348,11 @@ if( typeof Daisy === 'undefined')
 							var cur_text = me.caret.value;
 							if(cur_text !== pre_text) {
 								me.insertText(cur_text);
-								$.log(cur_text);
+								//$.log(cur_text);
 								pre_text = "";
 								me.caret.value = "";
 							}
-						}, 300);
+						}, 100);
 					})();
 				}
 			});
@@ -387,6 +386,9 @@ if( typeof Daisy === 'undefined')
 						var new_pos = me.doc.backspace(me.caret_position);
 						me._moveCaret_lc(new_pos.line, new_pos.colum);
 						me.render.paint();
+						break;
+					case 9:
+						me.insertText("    ");
 						break;
 					case 46:
 						//del键
@@ -592,13 +594,22 @@ if( typeof Daisy === 'undefined')
 				return this.CHAR_TYPE.UNICODE;
 		},
 		insertText : function(text) {
+			/**
+			 * 当前版本暂时拆分成单个字符插入。这样在插入少量文本时会有问题，暂时不考虑。
+			 * 下个版本会在document.js中的Document类中实现insert插入函数，不会再有性能问题。
+			 */
+			for(var i=0;i<text.length;i++){
+				var c = text[i],new_pos = null;
+				if(c==='\n'){
+					new_pos = this.doc.insertLine(this.caret_position);
+				}else{
+					new_pos = this.doc.insertChar(c,this.caret_position);
+				}
+				this._moveCaret_lc(new_pos.line, new_pos.colum);
+			}
+			this.render.paint();
 			
-			//var new_pos = this.doc.insertText(text, this.caret_position);
-			
-			//this.render.paint();
-			
-			//this._moveCaret_lc(new_pos.line, new_pos.colum);
-			$.log("insert:"+text);
+			//$.log("insert:"+text);
 			
 		},
 		/**
@@ -699,8 +710,6 @@ if( typeof Daisy === 'undefined')
 		},
 		appendText : function(text) {
 			this.doc.append(text);
-			//this.doc.append(text);
-			//this.measure.refresh();
 			this.render.paint();
 		}
 	}
