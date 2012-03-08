@@ -46,6 +46,7 @@ Daisy._LexerManager.prototype = {
 		 * 具体来说，应该有一个队列维护当前的lex请求，如果队列中只会存在最多两个请求，一个是正在执行的，一个是待执行的，
 		 * 如果当前正在执行的 lex 工作未完成，后续的更多的lex请求只接受一个，即最近的一个。
 		 */
+		
 		var me = this;
 		if(lines!=null)
 			this.check_line = this.check_line.concat(lines);

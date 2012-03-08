@@ -1,7 +1,7 @@
 $(function(){
 	d_editor = new Daisy._Editor({
-		width: 400,
-		height: 300,
+		width: 1000,
+		height: 800,
 		lexer : Daisy.Lexer.JS,
 		theme : Daisy.Theme.Daisy
 	});

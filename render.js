@@ -139,15 +139,8 @@ if( typeof Daisy === 'undefined')
 			 * 重新设置内容大小。比如当最长的一行长度发生变化，或者行数发生变化时，
 			 * 需要重新设置新的滚动值（scroll_top,scroll_left）等。
 			 */
-			var c_height = this.doc.line_number * this.line_height, c_width = this.doc.max_width_line.width + this.editor.PADDING_RIGHT;
-
-			this.content_width = c_width > this.width ? c_width : this.width;
-			this.content_height = c_height > this.height ? c_height : this.height;
-			this.max_scroll_left = this.content_width - this.width;
-			this.max_scroll_top = this.content_height - this.height;
-			this.editor.bottom_scroll_body.style.width = c_width + "px";
-			this.editor.right_scroll_body.style.height = c_height + "px";
-			//$.log(c_width);
+			this.resetRenderWidth();
+			this.resetRenderHeight();
 		},
 		_paintSelect : function(select_range) {
 			var f = select_range.from, t = select_range.to, lines = this.doc.line_info;
@@ -226,7 +219,7 @@ if( typeof Daisy === 'undefined')
 		},
 		paint : function() {
 			
-			//var f_time = new Date().getTime();
+			var f_time = new Date().getTime();
 			
 			this.doc.check_width(this.region.start_line,this.region.end_line);
 				
@@ -250,7 +243,8 @@ if( typeof Daisy === 'undefined')
 				this._paintSelect(this.doc.select_range);
 			}
 			/**
-			 * 接下来绘制所有文本。
+			 * 接下来绘制所有文本。当前算法不够优化，是一个字符一个字符的绘制，效率有点低。当文本很多，编辑区很大时略显卡。
+			 * to do...
 			 */
 			var cur_line = this.region.start_line, left = -this.region.left, top = this.line_height + cur_line * this.line_height - this.region.top;
 
@@ -289,7 +283,7 @@ if( typeof Daisy === 'undefined')
 
 			}
 
-			//$.log("paint time: " + (new Date().getTime() - f_time));
+			$.log("paint time: " + (new Date().getTime() - f_time));
 		},
 		
 		scrollLeft : function(value) {
