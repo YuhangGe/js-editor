@@ -11,11 +11,11 @@ $(function(){
 	//for(var i=2;i<8;i++)
 		//s2 += ("\n"+i);
 	
-	//d_editor.doc.append_2(s2);
+	//d_editor.appendText(s2);
 	//do_test();
-	d_editor.appendText("/* 我爱\t小扬 */\nabcde\n\n\nbedc\ndef");
-	//d_editor.appendText("\na\nabc/hij/oo\n\abc\\hij\oo\n");
-	d_editor.appendText("/* love 葛 daisy */\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
+	//d_editor.appendText("abc\ndef\n/* 我爱\t小扬 */\n\n\nbedc\ndef");
+	d_editor.appendText("abc");
+	//d_editor.appendText("/* love 葛 daisy */\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
 	//$.log(d_editor.doc.line_info);
 	//for(var i=0;i<10;i++)
 		//d_editor.appendString(str+str+str);

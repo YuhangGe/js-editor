@@ -5,7 +5,7 @@ if(typeof Daisy.Theme === 'undefined')
 	
 (function(D,T){
 	T.Daisy = {
-		font : '18px consolas',
+		font : '25px 宋体',
 		background : 'black',
 		caret_color : 'rgba(255,255,255,0.8)',
 		selection : {

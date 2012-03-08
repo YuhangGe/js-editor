@@ -186,10 +186,12 @@ if( typeof Daisy.Lexer === 'undefined')
 			this.i_s = state;
 		},
 		lex : function() {
+			//var f_t = new Date().getTime();
 			this.src = this.editor.doc.text_array;
 			this.end = this.src.length;
 			this.i_s = 131;
 			this.do_lex();
+			//$.dprint("lex time:%d",new Date().getTime()-f_t);
 		}
 	}
 

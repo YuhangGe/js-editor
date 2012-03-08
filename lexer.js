@@ -29,3 +29,52 @@ Daisy.Lexer.Help = {
 
 	}
 }
+
+Daisy._LexerManager = function(editor,lexer){
+	this.editor = editor;
+	this.lexer = new lexer(editor);
+	this.busy_work = null;
+	this.wait = false;
+	this.check_line = [];
+}
+Daisy._LexerManager.prototype = {
+	lex : function(lines){
+		/**
+		 * 此处把lex工作交给另外一个线程处理。因为当文本量巨大的时候，lex工作会消耗很多时间。
+		 * 注意这里是没有作用的，setTimeout并没有起到多线程的作用，当lex正在执行的时候还是会卡住，这里只是演示一个设计。
+		 * 下一个版本会学习并使用javascript 的 Work 类实现多进程。
+		 * 具体来说，应该有一个队列维护当前的lex请求，如果队列中只会存在最多两个请求，一个是正在执行的，一个是待执行的，
+		 * 如果当前正在执行的 lex 工作未完成，后续的更多的lex请求只接受一个，即最近的一个。
+		 */
+		var me = this;
+		if(lines!=null)
+			this.check_line = this.check_line.concat(lines);
+			// for(var i=0;i<lines.length;i++){
+				// if(this.check_line.indexOf(lines[i])<0)
+					// this.check_line.push(lines[i]);
+			// }
+		if(this.busy_work===null){
+			this.busy_work = setTimeout(function(){
+				var f_t = new Date().getTime();
+				me.lexer.lex();
+				//$.log('lex time: '+ (new Date().getTime()-f_t))
+				for(var i=0;i<me.check_line.length;i++){
+					me.editor.doc.line_info[me.check_line[i]].check_width = true;
+				}
+				//$.log(me.check_line.length);
+				me.check_line.length = 0;
+				me.editor.render.paint();
+				me.busy_work = null;
+				if(me.wait){
+					me.wait = false;
+					setTimeout(function(){
+						me.lex();
+					},0);
+				}
+			},0);
+		}else{
+			//$.log('busy!');
+			this.wait = true;
+		}
+	}
+}

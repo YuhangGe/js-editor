@@ -105,7 +105,19 @@ if( typeof Daisy === 'undefined')
 			return this.ctx.measureText(text).width
 		},
 		getTextWidth : function(text) {
+			this.ctx.font = this.theme.font;
 			return this.ctx.measureText(text).width;
+		},
+		resetRegion : function() {
+			/*
+			 * 设置显示字符区域。通常在document中的内容发生变化（添加删除）后调用。
+			 * 包括重新设置显示的行等信息。
+			 */
+			var lines = this.doc.line_info, len = this.doc.line_number, ls = Math.floor(this.region.top / this.line_height), le = Math.floor(this.region.bottom / this.line_height), ls = len > ls ? ls : len, le = len > le ? le : len - 1;
+
+			this.region.start_line = ls;
+			this.region.end_line = le;
+
 		},
 		resetContentSize : function() {
 			/**
@@ -120,10 +132,7 @@ if( typeof Daisy === 'undefined')
 			this.max_scroll_top = this.content_height - this.height;
 			this.editor.bottom_scroll_body.style.width = c_width + "px";
 			this.editor.right_scroll_body.style.height = c_height + "px";
-			/**
-			 * 还需要设置字符区域的大小。见函数注释.
-			 */
-			this.resetRegion();
+			//$.log(c_width);
 		},
 		_paintSelect : function(select_range) {
 			var f = select_range.from, t = select_range.to, lines = this.doc.line_info;
@@ -155,6 +164,7 @@ if( typeof Daisy === 'undefined')
 				
 				this._paintSelectLine(s,s_colum,null,true);
 				for(var i=s+1;i<e;i++){
+					//$.log(i)
 					this._paintSelectLine(i,null,null,true);
 				}
 				this._paintSelectLine(e,null,e_colum,false);
@@ -196,8 +206,16 @@ if( typeof Daisy === 'undefined')
 				this.ctx.fillRect(0,c_l*this.line_height-this.region.top,this.buffer_width,this.line_height);
 			}
 		},
+		_check_width : function(){
+			
+		},
 		paint : function() {
-			var f_time = new Date().getTime();
+			
+			//var f_time = new Date().getTime();
+			
+			this.doc.check_width(this.region.start_line,this.region.end_line);
+				
+			
 			this.ctx.font = this.theme.font;
 			this.ctx.textAlign = "start";
 			this.ctx.textBaseline = 'bottom';
@@ -256,19 +274,9 @@ if( typeof Daisy === 'undefined')
 
 			}
 
-			$.log("paint time: " + (new Date().getTime() - f_time));
+			//$.log("paint time: " + (new Date().getTime() - f_time));
 		},
-		resetRegion : function() {
-			/*
-			 * 设置显示字符区域。通常在document中的内容发生变化（添加删除）后调用。
-			 * 包括重新设置显示的行等信息。
-			 */
-			var lines = this.doc.line_info, len = lines.length, ls = Math.floor(this.region.top / this.line_height), le = Math.floor(this.region.bottom / this.line_height), ls = len > ls ? ls : len, le = len > le ? le : len - 1;
-
-			this.region.start_line = ls;
-			this.region.end_line = le;
-
-		},
+		
 		scrollLeft : function(value) {
 			var page = Math.floor(value / this.page_width);
 			this.left_page_offset = value - page * this.page_width;

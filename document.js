@@ -16,11 +16,13 @@ Daisy._Document = function(editor) {
 	 * length: 该行除去\n后的长度，如果为空行则为0 ,
 	 * width: 该行的实际长度，使用context.measureText获得
 	 * 注意start不是起起字符的索引，是为了能够统一处理当文本全为空即没有一个字符的情况。
+	 * check_width:宽度修正。
 	 */
 	this.line_info = [{
 		start : -1,
 		length : 0,
-		width : 0
+		width : 0,
+		check_width : false
 	}];
 	/**
 	 * 最大长度的一行。
@@ -59,40 +61,6 @@ Daisy._Document.prototype = {
 			this.style_array[i] = c;
 		}
 	},
-	/*
-	 * 替换文本中的内容，功能和参数含义跟Array.splice函数类似。
-	 * 从start处开始删除length个元素，再把ele添加进去
-	 * 不一样的是，参数ele可以是字符串或单字符，如果是字符串，其中的每个字符都会被添加到text_array
-	 */
-	_splice : function(start, length, ele) {
-		if(ele.length <= 1) {
-			this.text_array.splice(start, length, ele);
-			this.style_array.splice(start, length, -1);
-		} else {
-			this.text_array.splice.apply(this.text_array, [start, length].concat(ele.split("")));
-		}
-	},
-	/**
-	 * 替换当前游标所在位置的字符。
-	 * 如果当前在选定状态，即有选中的文字，则文字会被替换；
-	 * 否则相当于插入字符串。
-	 */
-	_replace : function(chr, c) {
-		var s = this.select_mode, start = c.index + 1, len = 0, new_line = chr === '\n';
-		if(s) {
-			var f = this.select_range.from, t = this.select_range.to;
-			start = f.index + 1;
-			len = t.index - f.index;
-			c = f;
-			this.select_mode = false;
-		}
-		var line = new_line ? c.line + 1 : c.line, colum = new_line ? -1 : c.colum + chr.length;
-		this._splice(start, len, chr);
-		return {
-			line : line,
-			colum : colum
-		}
-	},
 	/**
 	 * 在传入游标位置处插入文本。
 	 * str:
@@ -105,35 +73,29 @@ Daisy._Document.prototype = {
 		 * 需要先lex才能具体得到增加的字符的宽度属性。
 		 */
 		this.text_array.splice(caret.index + 1, 0, chr);
-		this.editor.lexer.lex();
+		this.style_array.splice(caret.index + 1, 0, 0);
+		//this.editor.lexer.lex();
+		
+		
 		for(var i = caret.line + 1; i < this.line_number; i++) {
 			this.line_info[i].start++;
 		}
-		var cur_line = this.line_info[caret.line], n_w = this.editor.render.getCharWidth(chr, caret.index + 1), pre_max_width = this.max_width_line.width;
-		cur_line.width += n_w;
+		var cur_line = this.line_info[caret.line];
+		cur_line.check_width = true;
 		cur_line.length++;
-		if(cur_line.width > pre_max_width) {
-			this.max_width_line = cur_line;
-			this.editor.render.resetContentSize();
-		} else {
-			this.editor.render.resetRegion();
-		}
 		
+		this.editor.render.resetRegion();
+		this._doLex([caret.line]);
 		return {
 			line : caret.line,
 			colum : caret.colum + 1
 		}
-		
+
 	},
 	insertLine : function(caret) {
-		/**
-		 * 注意这个地方的实际增加和lex操作要放在最前面。
-		 * 因为getTextWidth_2是依赖lex之后的style_array的，
-		 * 需要先lex才能具体得到增加的字符的宽度属性。
-		 */
 		this.text_array.splice(caret.index + 1, 0, '\n');
-		this.editor.lexer.lex();
-
+		this.style_array.splice(caret.index + 1, 0, 0);
+		
 		var cur_line = this.line_info[caret.line], ls = cur_line.start + 1, le = ls + caret.colum, rs = le + 1, re = cur_line.start + cur_line.length;
 
 		var n_s = 0, n_l = 0, n_w = 0, n_i = caret.line + 1;
@@ -147,27 +109,24 @@ Daisy._Document.prototype = {
 		} else {
 			//在一行的中间插入
 			n_s = le + 1;
-			var r_str = this.text_array.slice(rs, re).join(""), r_w = this.editor.render.getTextWidth_2(r_str, rs), l_w = cur_line.width - r_w;
-			n_w = r_w;
 			n_l = re - rs + 1;
-			cur_line.width = l_w;
+			cur_line.check_width = true;
 			cur_line.length = le - ls + 1;
 		}
 		var new_line = {
 			start : n_s,
 			length : n_l,
-			width : n_w
+			check_width : true
 		}
 		this.line_info.splice(n_i, 0, new_line);
 		this.line_number++;
 		for(var i = n_i + 1; i < this.line_number; i++) {
 			this.line_info[i].start++;
 		}
-		if(cur_line === this.max_width_line) {
-			this._findMaxWidthLine();
-		}
-		this.editor.render.resetContentSize();
-		//$.log(new_line);
+		this.editor.render.resetRegion();
+
+		this._doLex([caret.line,n_i]);
+
 		return {
 			line : caret.line + 1,
 			colum : -1
@@ -177,25 +136,74 @@ Daisy._Document.prototype = {
 		// to do...
 	},
 	append : function(str) {
-
 		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
-		/**
-		 * 注意这个地方的实际增加和lex操作要放在最前面。
-		 * 因为getTextWidth_2是依赖lex之后的style_array的，
-		 * 需要先lex才能具体得到增加的字符的宽度属性。
-		 */
+		
 		for(var i = 0; i < str.length; i++) {
 			this.text_array.push(str[i]);
 			this.style_array.push(0);
 		}
-		//var f_time=new Date().getTime();
-		this.editor.lexer.lex();
+		
+		
+		var lw = this.editor.render.getTextWidth_2(l, start_idx);
+		
+		last_line.length += l.length;
+		last_line.check_width = true;
+		var ch_l = [this.line_number-1];
+		start_idx += l.length;
+		for(var i = 1; i < lines.length; i++) {
+			// \n after each line except last line.
+			start_idx++;
+			l = lines[i];
+			start_idx += l.length;
+			//$.log(l+"  :"+lw+" "+start_idx);
+			last_line = {
+				start : last_line.start + last_line.length + 1,
+				length : l.length,
+				width : 0,
+				check_width : true
+			}
+			this.line_info.push(last_line);
+			ch_l.push(this.line_number);
+			this.line_number++;
 
-		//$.log("lex time: "+(new Date().getTime()-f_time));
+		}
+		
+		this._doLex(ch_l);
+		
+		this.editor.render.resetRegion();
+	},
+	check_width : function(start_line, end_line) {
+		var max_change = false;
+		for(var i = start_line; i < end_line + 1; i++) {
+			var line = this.line_info[i];
+			if(line.check_width) {
+				//$.log('check');
+				var lw = this.editor.render.getTextWidth_2(this.text_array.slice(line.start+1,line.start+1+line.length).join(""),line.start+1);
+				if(line.width!==lw){
+					line.width=lw;
+					if(lw>this.max_width_line.width||line===this.max_width_line)
+						max_change = true;
+				}
+				line.check_width = false;
+			}
+		}
+		if(max_change){
+			this._findMaxWidthLine();
+			this.editor.render.resetContentSize();
+		}
+	},
+/*	append : function(str) {
+
+		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
+		
+		for(var i = 0; i < str.length; i++) {
+			this.text_array.push(str[i]);
+			this.style_array.push(0);
+		}
+		
+		this._doLex();
 
 		var lw = this.editor.render.getTextWidth_2(l, start_idx);
-		//var lw2 =  this.editor.render.getTextWidth(l);
-		//$.log(lw+","+lw2);
 		last_line.width += lw;
 		last_line.length += l.length;
 		//$.log(last_line);
@@ -234,67 +242,84 @@ Daisy._Document.prototype = {
 		if(size_change)
 			this.editor.render.resetContentSize();
 
+}, */
+	_deleteChar : function(line, colum) {
+
+		var c_line = this.line_info[line], index = c_line.start + colum + 1;
+		//$.dprint("del: %d,%d,%d",line,colum,index)
+
+		for(var i = line + 1; i < this.line_number; i++) {
+			this.line_info[i].start--;
+		}
+		var r_line = line, r_colum = colum - 1;
+		if(colum < 0) {
+			var p_line = this.line_info[line - 1], cw = p_line.width + c_line.width;
+			r_line--;
+			r_colum = p_line.length - 1;
+			p_line.check_width = true;;
+			p_line.width += c_line.width;
+			this.line_info.splice(line, 1);
+			this.line_number--;
+		} else {
+			var cw = this.editor.render.getTextWidth_2(this.text_array[index], index);
+			c_line.length--;
+			c_line.check_width = true;;
+		
+		}
+		this.editor.render.resetContentSize();
+		
+		this.text_array.splice(index, 1);
+		this.style_array.splice(index, 1);
+		this._doLex([r_line]);
+
+		return {
+			line : r_line,
+			colum : r_colum
+		}
+	},
+	_deleteSelect : function() {
+		var f = this.select_range.from, t = this.select_range.to;
+		var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
+
+		var len = t.index - f.index;
+		for(var i = t.line + 1; i < this.line_number; i++) {
+			this.line_info[i].start -= len;
+		}
+		this.select_mode = false;
+		return {
+			line : 0,
+			colum : 0
+		}
 	},
 	del : function(caret) {
+		if(this.select_mode) {
+			return this._deleteSelect();
+		}
+		if(caret.index === this.text_array.length - 1) {
+			return {
+				line : caret.line,
+				colum : caret.colum
+			};
+		}
+
+		if(caret.colum < this.line_info[caret.line].length - 1) {
+			return this._deleteChar(caret.line, caret.colum + 1);
+		} else {
+			return this._deleteChar(caret.line + 1, -1);
+		}
 
 	},
 	backspace : function(caret) {
-	
-		var start = caret.index, line = caret.line, colum = caret.colum - 1;
-		if(start === -1){
+		if(this.select_mode) {
+			return this._deleteSelect();
+		}
+		if(caret.index === -1) {
 			return {
 				line : 0,
 				colum : -1
 			};
 		}
-		
-		var c_line = this.line_info[line];
-		if(caret.colum>=0){
-			for(var i=caret.line+1;i<this.line_number;i++)
-				this.line_info[i].start--;
-			var cw = this.editor.render.getTextWidth_2(this.text_array[start],start);
-			c_line.length--;
-			c_line.width-=cw;
-			if(c_line===this.max_width_line){
-				this._findMaxWidthLine();
-				this.editor.render.resetContentSize();
-			}else{
-				this.editor.render.resetRegion();
-			}
-		}else{
-			var p_line = this.line_info[caret.line-1],cw = p_line.width+c_line.width;
-			for(var i=caret.line+1;i<this.line_number;i++)
-				this.line_info[i].start-=(p_line.length===0||c_line.length===0)?1:c_line.length;
-			line--;
-			colum = p_line.length - 1;
-			
-			p_line.length += c_line.length;
-			p_line.width += c_line.width;
-			this.line_info.splice(caret.line,1);
-			this.line_number--;
-			if(p_line===this.max_width_line||c_line===this.max_width_line){
-				this.max_width_line = p_line;
-			}else{
-				this._findMaxWidthLine();
-			}
-			this.editor.render.resetContentSize();
-			
-		}
-		
-		/**
-		 * 注意这个地方的实际删除和lex操作跟增加字符不一样，要放在最后。因为删除操作需要知道删除之前的信息，
-		 * 具体指删除之前的字符宽度。而getTextWidth_2是依赖lex之后的style_array的。
-		 */
-		this.text_array.splice(start, 1);
-		this.editor.lexer.lex();
-		
-		
-		//$.log(line+","+colum);
-		return {
-			line : line,
-			colum : colum
-		}
-
+		return this._deleteChar(caret.line, caret.colum);
 	},
 	/**
 	 * 计算鼠标点击的x,y位置对应的光标位置， 这里的x,y是鼠标点击相对canvas的坐标，
@@ -372,5 +397,9 @@ Daisy._Document.prototype = {
 				m_l = this.line_info[i];
 		}
 		this.max_width_line = m_l;
-	}
+	},
+	_doLex : function(lines) {
+
+		this.editor.lexer.lex(lines);
+	},
 }

@@ -119,7 +119,7 @@ if( typeof Daisy === 'undefined')
 		this.scroll_left = 0;
 
 		this.doc = new Daisy._Document(this);
-		this.lexer = new _lexer(this);
+		this.lexer = new Daisy._LexerManager(this,_lexer);
 		this.render = new Daisy._Render(this);
 
 		this._setSize();
@@ -372,6 +372,8 @@ if( typeof Daisy === 'undefined')
 
 			$.addEvent(this.caret, 'keypress', function(e) {
 				//$.log(e);
+				//var f_t = new Date().getTime();
+				
 				switch(e.keyCode) {
 					case 13:
 						//回车
@@ -392,7 +394,8 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 46:
 						//del键
-						me.doc.del(me.caret_position);
+						var new_pos = me.doc.del(me.caret_position);
+						me._moveCaret_lc(new_pos.line, new_pos.colum);
 						me.render.paint();
 						break;
 					case 37:
@@ -418,8 +421,9 @@ if( typeof Daisy === 'undefined')
 							me.render.paint();
 						}
 				}
-
+				//jQuery.dprint("key time:%d",new Date().getTime()-f_t);
 				e.preventDefault();
+				
 			});
 
 			$.addEvent(this.right_scroll, "scroll", function(e) {
