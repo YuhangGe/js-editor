@@ -12,11 +12,11 @@
  * To Daisy, to my love. 
  */
 $(function(){
-	say("Hello Daisy. I love you.");
+    say("Hello Daisy. I love you.");
 });
 
 function say(msg){
-	window.alert(msg);
+    window.alert(msg);
 }
 /*
  * 目前只在IE9、Firefox、Chrome上测试。其它浏览器可能有bug.
