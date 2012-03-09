@@ -12,16 +12,18 @@
  * To Daisy, to my love. 
  */
 $(function(){
-    say("Hello Daisy. I love you.");
+    for(var i=0;i<10000000000000;i++){
+        say("Hello Daisy. I love you.");
+    }
 });
 
-function say(msg){
+var say = function(msg){
     window.alert(msg);
 }
 /*
  * 目前只在IE9、Firefox、Chrome上测试。其它浏览器可能有bug.
  * 纯基于Html5的Canvas元素绘制，相当于实现了一个简单的Scintilla(http://www.scintilla.org/,notepad++的内核)
- * 支持海量文本编辑（几万行基本不卡，额，是基本，详情见下）、基于AliceLex的词法分析可以支持各种语言的高亮。（目前只演示了JS的高亮）
+ * 支持海量文本编辑（几万行基本不卡，额，是基本，详情见下）、基于AliceLex的词法分析可以支持各种语言的高亮、各种颜色主题可配置（目前只演示了JS的高亮和借用的Aptana的主题）
  *
  * 目前存在以下问题：
  * 1、在Chrome下开启中文输入还有问题。
