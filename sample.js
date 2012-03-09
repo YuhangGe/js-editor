@@ -6,9 +6,9 @@ $(function(){
 		theme : Daisy.Theme.Daisy
 	});
 	
-	$.get("https://raw.github.com/YuhangGe/daisy-editor/master/daisy-editor.txt",function(data){
+	$.ajax("https://raw.github.com/YuhangGe/daisy-editor/master/readme.txt",function(data){
 		 d_editor.appendText(data);
-	})
+	},"text")
 });
 
 function load_jquery(){
