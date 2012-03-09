@@ -66,7 +66,7 @@ if( typeof Daisy === 'undefined')
 		 * 得到文本text的宽度。
 		 * index是该文本段的起起位置在text_array中的索引，通过这个可以结合style_array得到
 		 * 精确的文本宽度，即使该text文本中有加粗的不同样式。
-		 * 
+		 *
 		 * 当前的实现不够好，因为不需要传入text这样一个string类型的字符串，还得额外传入index。
 		 * 所有文本都放在了text_array中，直接传入开始到结束的索引就行了。
 		 * 但由于历史原因，以及这样一改动会影响很多地方的代码，暂时没有这样优化，而且目前看到当前实现的效率也可以接受。
@@ -119,7 +119,7 @@ if( typeof Daisy === 'undefined')
 			this.region.end_line = le;
 
 		},
-		resetRenderWidth : function(){
+		resetRenderWidth : function() {
 			var c_width = this.doc.max_width_line.width + this.editor.PADDING_RIGHT;
 
 			this.content_width = c_width > this.width ? c_width : this.width;
@@ -127,12 +127,12 @@ if( typeof Daisy === 'undefined')
 			this.editor.bottom_scroll_body.style.width = c_width + "px";
 			//$.log(c_width);
 		},
-		resetRenderHeight : function(){
+		resetRenderHeight : function() {
 			var c_height = this.doc.line_number * this.line_height;
 			this.content_height = c_height > this.height ? c_height : this.height;
 			this.max_scroll_top = this.content_height - this.height;
 			this.editor.right_scroll_body.style.height = c_height + "px";
-		
+
 		},
 		resetContentSize : function() {
 			/**
@@ -166,16 +166,16 @@ if( typeof Daisy === 'undefined')
 			this.ctx.fillStyle = this.theme.selection.background;
 
 			if(s === e) {
-			
-				this._paintSelectLine(s,s_colum,e_colum,false);
+
+				this._paintSelectLine(s, s_colum, e_colum, false);
 			} else {
-				
-				this._paintSelectLine(s,s_colum,null,true);
-				for(var i=s+1;i<e;i++){
+
+				this._paintSelectLine(s, s_colum, null, true);
+				for(var i = s + 1; i < e; i++) {
 					//$.log(i)
-					this._paintSelectLine(i,null,null,true);
+					this._paintSelectLine(i, null, null, true);
 				}
-				this._paintSelectLine(e,null,e_colum,false);
+				this._paintSelectLine(e, null, e_colum, false);
 			}
 
 		},
@@ -190,40 +190,55 @@ if( typeof Daisy === 'undefined')
 			/**
 			 * 注意Array.slice(start,end)函数的用法。其区间是[start,end)，不包括end
 			 */
-			var line = this.doc.line_info[line_index],arr=this.doc.text_array,
-				colum_from=(colum_from==null?-1:colum_from),
-				colum_to = (colum_to==null?line.length-1:colum_to);
-	
+			var line = this.doc.line_info[line_index], arr = this.doc.text_array, colum_from = (colum_from == null ? -1 : colum_from), colum_to = (colum_to == null ? line.length - 1 : colum_to);
+
 			var i_from = line.start + colum_from + 1, i_to = line.start + colum_to + 1;
-			var w_1 = colum_from < 0 ? 0 : this.getTextWidth_2(arr.slice(line.start + 1, i_from+1).join(""), line.start + 1);
-			var w_2 = colum_to === line.length - 1 ? line.width - w_1 : this.getTextWidth_2(arr.slice(i_from+1, i_to+1 ).join(""), i_from);
- 			//$.dprint("%d,%d,%d",w_1,w_2,line.width)
- 			//$.log(arr.slice(i_from, i_to+1 ).join(""))
-			w_2+=cross_line?10:0;	//先暂时只是简单加10，以后再在初始时计算\n字符宽度。
+			var w_1 = colum_from < 0 ? 0 : this.getTextWidth_2(arr.slice(line.start + 1, i_from + 1).join(""), line.start + 1);
+			var w_2 = colum_to === line.length - 1 ? line.width - w_1 : this.getTextWidth_2(arr.slice(i_from + 1, i_to + 1).join(""), i_from);
+			//$.dprint("%d,%d,%d",w_1,w_2,line.width)
+			//$.log(arr.slice(i_from, i_to+1 ).join(""))
+			w_2 += cross_line ? 10 : 0;
+			//先暂时只是简单加10，以后再在初始时计算\n字符宽度。
 			/*
 			 * 这个地方没有考虑选择区域的宽度超过了显示区域的大小。因为fillRect会自己处理。
 			 */
-			this.ctx.fillRect(w_1-this.region.left, line_index * this.line_height - this.region.top, w_2, this.line_height);
+			this.ctx.fillRect(w_1 - this.region.left, line_index * this.line_height - this.region.top, w_2, this.line_height);
 		},
-		_paintCurrentLine : function(){
+		_paintCurrentLine : function() {
 			var c_l = this.editor.caret_position.line;
 			//$.log(c_l)
-			if(c_l>=this.region.start_line&&c_l<=this.region.end_line){
+			if(c_l >= this.region.start_line && c_l <= this.region.end_line) {
 				//$.log(c_l);
 				this.ctx.fillStyle = this.theme.current_line.background;
-				this.ctx.fillRect(0,c_l*this.line_height-this.region.top,this.buffer_width,this.line_height);
+				this.ctx.fillRect(0, c_l * this.line_height - this.region.top, this.buffer_width, this.line_height);
 			}
 		},
-		_check_width : function(){
-			
+		_check_width : function() {
+			var max_change = false,max_line = this.doc.max_width_line;
+			for(var i = this.region.start_line; i < this.region.end_line + 1; i++) {
+				var line = this.doc.line_info[i];
+				if(line.check_width) {
+					//$.log('check');
+					var lw = this.getTextWidth_2(this.doc.text_array.slice(line.start + 1, line.start + 1 + line.length).join(""), line.start + 1);
+					if(line.width !== lw) {
+						line.width = lw;
+						if(lw > max_line.width || line === max_line)
+							max_change = true;
+					}
+					line.check_width = false;
+				}
+			}
+			if(max_change) {
+				this.doc._findMaxWidthLine();
+				this.resetRenderWidth();
+			}
 		},
 		paint : function() {
-			
+
 			var f_time = new Date().getTime();
-			
-			this.doc.check_width(this.region.start_line,this.region.end_line);
-				
-			
+
+			this._check_width();
+
 			this.ctx.font = this.theme.font;
 			this.ctx.textAlign = "start";
 			this.ctx.textBaseline = 'bottom';
@@ -247,45 +262,76 @@ if( typeof Daisy === 'undefined')
 			 * to do...
 			 */
 			var cur_line = this.region.start_line, left = -this.region.left, top = this.line_height + cur_line * this.line_height - this.region.top;
-
+			
+			var t_arr = this.doc.text_array,s_arr = this.doc.style_array;
+			
+			line_loop:
 			for(var l = this.region.start_line; l <= this.region.end_line; l++) {
-				var line = this.doc.line_info[l];
-
-				for(var i = line.start + 1; i <= line.start + line.length; i++) {
-					var t = this.doc.text_array[i], c = this.doc.style_array[i], s = this.styles[c];
-					if(s.italic || s.bold) {
-						this.ctx.font = (s.bold ? 'bold ' : '') + (s.italic ? 'italic ' : '') + this.theme.font;
-					} else {
-						this.ctx.font = this.theme.font;
-					}
-					/* 
-					 * if(t==="\t")
-						t="    ";
-					 * 当前实现暂时没有考虑\t字符，是在前端（即caret的输入事件）处理，将\t直接硬转换成4个空格。
-					 * 下个版本会重写这个的实现。
-					 */
-					var cw = this.ctx.measureText(t).width;
-					/**
-					 * 只绘制缓冲区region内的字符。
-					 */
-					if(left + cw > 0) {
-
-						this.ctx.fillStyle = s.color;
-						this.ctx.fillText(t, left, top);
-						if(left > this.region.width) {
-							break;
+				var line = this.doc.line_info[l],idx = line.start+1,idx_e = idx+line.length;
+				if(line.length===0){
+					top += this.line_height;
+					continue;
+				}
+				var l_s = idx,pre_c = s_arr[idx];
+				idx++;
+				while(idx<idx_e){
+					if(s_arr[idx]!==pre_c){
+						this.ctx.font = this.styles[pre_c].font;
+						
+						var seg = t_arr.slice(l_s,idx).join("");
+						//$.log(seg);
+						var cw = this.ctx.measureText(seg).width;
+						if(left+cw>0){
+							this.ctx.fillStyle = this.styles[pre_c].color;
+							this.ctx.fillText(seg,left,top);
+						}
+						l_s = idx;
+						pre_c = s_arr[idx];
+						left+=cw;
+						if(left>this.region.width){
+							top += this.line_height;
+							left = -this.region.left;
+							continue line_loop;
 						}
 					}
-					left += cw;
+					idx++;
 				}
+				this.ctx.font = this.styles[pre_c].font;
+				this.ctx.fillStyle = this.styles[pre_c].color;
+				var seg = t_arr.slice(l_s,idx).join("");
+				this.ctx.fillText(seg,left,top);		
+				
 				top += this.line_height;
 				left = -this.region.left;
+				// for(var i = line.start + 1; i <= line.start + line.length; i++) {
+					// var t = this.doc.text_array[i], c = this.doc.style_array[i], s = this.styles[c];
+					// this.ctx.font = s.font;
+					// /*
+					 // * if(t==="\t")
+					 // t="    ";
+					 // * 当前实现暂时没有考虑\t字符，是在前端（即caret的输入事件）处理，将\t直接硬转换成4个空格。
+					 // * 下个版本会重写这个的实现。
+					 // */
+					// var cw = this.ctx.measureText(t).width;
+					// /**
+					 // * 只绘制缓冲区region内的字符。
+					 // */
+					// if(left + cw > 0) {
+// 
+						// this.ctx.fillStyle = s.color;
+						// this.ctx.fillText(t, left, top);
+						// if(left > this.region.width) {
+							// break;
+						// }
+					// }
+					// left += cw;
+//				}
+				
 
 			}
 
 			$.log("paint time: " + (new Date().getTime() - f_time));
 		},
-		
 		scrollLeft : function(value) {
 			var page = Math.floor(value / this.page_width);
 			this.left_page_offset = value - page * this.page_width;
@@ -307,6 +353,7 @@ if( typeof Daisy === 'undefined')
 				this.region.top = page * this.page_height;
 				this.region.bottom = this.region.top + this.buffer_height;
 				this.resetRegion();
+				//$.dprint("%d,%d",this.region.start_line,this.region.end_line);
 				//$.log("paint top buffer:"+page);
 
 				this.paint();

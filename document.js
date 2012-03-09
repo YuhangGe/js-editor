@@ -174,26 +174,7 @@ Daisy._Document.prototype = {
 			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
 	},
-	check_width : function(start_line, end_line) {
-		var max_change = false;
-		for(var i = start_line; i < end_line + 1; i++) {
-			var line = this.line_info[i];
-			if(line.check_width) {
-				//$.log('check');
-				var lw = this.editor.render.getTextWidth_2(this.text_array.slice(line.start+1,line.start+1+line.length).join(""),line.start+1);
-				if(line.width!==lw){
-					line.width=lw;
-					if(lw>this.max_width_line.width||line===this.max_width_line)
-						max_change = true;
-				}
-				line.check_width = false;
-			}
-		}
-		if(max_change){
-			this._findMaxWidthLine();
-			this.editor.render.resetRenderWidth();
-		}
-	},
+	
 	_deleteChar : function(line, colum) {
 
 		var c_line = this.line_info[line], index = c_line.start + colum + 1;

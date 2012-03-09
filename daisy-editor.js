@@ -148,12 +148,14 @@ if( typeof Daisy === 'undefined')
 		_createPalette : function() {
 			var j = 1;
 			for(var s in this.theme.styles) {
+				var s_v = this.theme.styles[s];
+				s_v.font = (s_v.bold ? 'bold ' : '') + (s_v.italic ? 'italic ' : '') + this.theme.font;
 				if(s === 'default') {
 					this.palette.keys['default'] = 0;
-					this.palette.values[0] = this.theme.styles[s];
+					this.palette.values[0] = s_v;
 				} else {
 					this.palette.keys[s] = j;
-					this.palette.values[j] = this.theme.styles[s];
+					this.palette.values[j] = s_v;
 					j++;
 				}
 			}
