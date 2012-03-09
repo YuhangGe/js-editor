@@ -12,9 +12,13 @@
         <script type="text/javascript" src="https://raw.github.com/YuhangGe/daisy-editor/master/theme/daisy.js"></script>
         <script type="text/javascript" src="https://raw.github.com/YuhangGe/daisy-editor/master/lexer/javascript.js"></script>
         <script type="text/javascript" src="https://raw.github.com/YuhangGe/daisy-editor/master/lexer/daisy.js"></script>
-        <script type="text/javascript" src="https://raw.github.com/YuhangGe/daisy-editor/master/index.js"></script>
+        <script type="text/javascript" src="https://raw.github.com/YuhangGe/daisy-editor/master/sample.js"></script>
+    
     	<style type="text/css">
-    		
+    		*{
+    			margin:0px;
+    			padding:0px;
+    		}
     		#e-canvas,#d-canvas{
     			cursor: text;
     			margin: 0px;
@@ -82,76 +86,69 @@
     			width: 500px;
     			height: 1px;
     		}
+    		
+    		
+    		body{
+    			text-align:center;	
+    		}
+    		a {
+    			color: #336699;
+    		}
+    		.out_body{
+    			width: 700px;
+    			margin:auto;
+    			text-align:left;
+    		}
+    		.head{
+    			margin-bottom: 20px;
+    		}
+    		.head h1{
+    			margin: 10px 0px;
+    		}
+    		.head h1 a{
+    			font-size: 16px;
+    			float: right;
+    			margin: 20px;
+    		}
+    		.content{
+    			
+    		}
+    		.foot{
+    			margin-top: 20px;
+    			text-align: center;
+    		}
     	</style>
     </head>
     <body>
-    	<h2>Hello Daisy. 你好~</h2>
-    	<div style="margin-left:100px;display: none;">
-    		 <div id="e-parent" >
-    		 <!--	<div id="e-right-scroll"> -->
-    		 		<canvas tabindex="0" width="400" height="350" id="e-canvas" ></canvas>
-	       			<input type="text" id="e-caret" />
-    		 <!--	</div> -->
-	       		
-      		 </div>
-    	</div>
-      	<br/>
-      	<div style="margin-left: 100px;display: inline-block;">
-      		<div id="d-editor">
-      			<div id="d-client">
-      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
+    	<div class="out_body">
+    		<div class="head">
+    			<h1>Daisy Editor<a href="https://github.com/YuhangGe/daisy-editor" target="_black">去GitHub关注</a></h1>
+    			<h4>——基于canvas的代码高亮编辑器</h4>
+    		</div>
+    		<div class="content">
+    			<div>
+       				<input type="button" value="Text" onclick="do_test();" />
+       			</div>
+    			<div style="position: relative;">
+		      		<div id="d-editor">
+		      			<div id="d-client">
+		      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
+		      			</div>
+		      			<input type="text" id="d-caret" />
+		      			<div id="d-rightscroll"><div id="d-rightscroll-body"></div></div>
+		      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
+		      			
+		      		</div>
       			</div>
-      			<input type="text" id="d-caret" />
-      			<div id="d-rightscroll"><div id="d-rightscroll-body"></div></div>
-      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
-      			
-      		</div>
-      	</div>
-       <div>
-       		<input type="button" value="Text" onclick="do_test();" />
-       </div>
-       <div >
-       	   <textarea rows="3" cols="20" resize="none" id="test">/**
- 1234456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ
- * @author  Abraham
- * @website http://yuhanghome.net
- * @address software institute, Nanjing University, The People's Republic of China, Earth. Oh Yeah, Oh No, Oh Daisy. Oh Abraham.
- * @email   abraham1@163.com | abeyuhang@gmail.com
- * @weibo   http://weibo.com/abeyuhang
- *
- * 两个命中注定孤独的人，
- * 如果无缘走到一起，是上帝想让他们更优秀；
- * 如果有缘走到一起，不是不再孤独，
- * 是上帝让他们更加适应孤独。
- *
- * 基于HTML5的canvas元素的前端代码编辑器，目标是实现一个前端的notepad++。
- * This is a source code editor like Notepad++，
- * but it is written by Javascript，and is based on the Canvas element of HTML5.
- *
- * To Daisy, To my love.
- *
- */</textarea>
-       </div>
-  <div style="width:300px;height:200px;display: none;overflow: hidden;">
-       	<div style="display: inline-block;height: 500px;width:600px;" >/**<br/>
- * @author  Abraham<br/>
- * @website http://yuhanghome.net<br/>
- * @address software institute, Nanjing University<br/>
- * @email   abraham1@163.com | abeyuhang@gmail.com<br/>
- * @weibo   http://weibo.com/abeyuhang<br/>
- *<br/>
- * 两个命中注定孤独的人，<br/>
- * 如果无缘走到一起，是上帝想让他们更优秀；<br/>
- * 如果有缘走到一起，不是不再孤独，<br/>
- * 是上帝让他们更加适应孤独。<br/>
- *<br/>
- * 基于HTML5的canvas元素的前端代码编辑器，目标是实现一个前端的notepad++。<br/>
- * This is a source code editor like Notepad++，<br/>
- * but it is written by Javascript，and is based on the Canvas element of HTML5.<br/>
- *<br/>
- * To Daisy, To my love.<br/>
- *<br/>
- */    </div>
-       </div>
+    		</div>
+    		<div class="foot">
+    			<a href="http://yuhanghome.net" target="_black">羽航的小屋</a>|<a href="mailto:abraham1@163.com">联系开发者</a>|<a href="http://weibo.com/abeyuhang" target="_blank">关注微博</a>
+    		</div>
+    	</div>
+    	
+    	
+      	
+       
+      
     </body>
 </html>

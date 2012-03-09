@@ -374,7 +374,7 @@ if( typeof Daisy === 'undefined')
 				}
 			});
 			$.addEvent(this.caret,"keydown",function(e){
-				//$.log(e);
+				//$.log(e.keyCode);
 				switch(e.keyCode) {
 					case 13:
 						//回车
@@ -392,7 +392,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 9:
 						me.insertText("    ");
-				 e.preventDefault();
+				 		e.preventDefault();
 						break;
 					case 46:
 						//del键
@@ -421,7 +421,7 @@ if( typeof Daisy === 'undefined')
 			});
 			 
 			$.addEvent(this.caret, 'keypress', function(e) {
-				//$.log(e);
+				//$.log(e.charCode);
 				//var f_t = new Date().getTime();
 				
 				
