@@ -76,7 +76,12 @@ if( typeof Daisy === 'undefined')
 			if(text.length === 0)
 				return 0;
 			var w = 0, a = 0, b = 0, pre = false, len = text.length, s = this.doc.style_array[index];
-			pre = this.styles[s].bold;
+			try{
+				pre = this.styles[s].bold;
+			}catch(e){
+				$.log(e);
+				throw e;
+			}
 			b = 1;
 			var i = 1;
 			while(i < len) {
@@ -103,10 +108,6 @@ if( typeof Daisy === 'undefined')
 		_getTextWidth : function(text, bold) {
 			this.ctx.font = ( bold ? 'Bold ' : '') + this.theme.font;
 			return this.ctx.measureText(text).width
-		},
-		getTextWidth : function(text) {
-			this.ctx.font = this.theme.font;
-			return this.ctx.measureText(text).width;
 		},
 		resetRegion : function() {
 			/*
@@ -258,8 +259,8 @@ if( typeof Daisy === 'undefined')
 				this._paintSelect(this.doc.select_range);
 			}
 			/**
-			 * 接下来绘制所有文本。当前算法不够优化，是一个字符一个字符的绘制，效率有点低。当文本很多，编辑区很大时略显卡。
-			 * to do...
+			 * 接下来绘制所有文本。
+			 * 
 			 */
 			var cur_line = this.region.start_line, left = -this.region.left, top = this.line_height + cur_line * this.line_height - this.region.top;
 			
@@ -303,34 +304,10 @@ if( typeof Daisy === 'undefined')
 				
 				top += this.line_height;
 				left = -this.region.left;
-				// for(var i = line.start + 1; i <= line.start + line.length; i++) {
-					// var t = this.doc.text_array[i], c = this.doc.style_array[i], s = this.styles[c];
-					// this.ctx.font = s.font;
-					// /*
-					 // * if(t==="\t")
-					 // t="    ";
-					 // * 当前实现暂时没有考虑\t字符，是在前端（即caret的输入事件）处理，将\t直接硬转换成4个空格。
-					 // * 下个版本会重写这个的实现。
-					 // */
-					// var cw = this.ctx.measureText(t).width;
-					// /**
-					 // * 只绘制缓冲区region内的字符。
-					 // */
-					// if(left + cw > 0) {
-// 
-						// this.ctx.fillStyle = s.color;
-						// this.ctx.fillText(t, left, top);
-						// if(left > this.region.width) {
-							// break;
-						// }
-					// }
-					// left += cw;
-//				}
-				
 
 			}
 
-			$.log("paint time: " + (new Date().getTime() - f_time));
+			//$.log("paint time: " + (new Date().getTime() - f_time));
 		},
 		scrollLeft : function(value) {
 			var page = Math.floor(value / this.page_width);

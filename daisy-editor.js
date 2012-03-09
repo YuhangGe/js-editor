@@ -250,12 +250,14 @@ if( typeof Daisy === 'undefined')
 			this.__mouse_down__ = false;
 			this.__pre_pos__ = null;
 			$.addEvent(this.canvas, 'mousedown', function(e) {
+				//$.log("down");
+				me.doc.select(null);
 				var p = me._getEventPoint(e);
 				me._moveCaret_xy(p.x, p.y);
 				me.__mouse_down__ = true;
-				me.select_mode = false;
 				me.__pre_pos__ = me.caret_position;
 				me.__down_pos__ = me.caret_position;
+				
 				if(me.canvas.setCapture)
 					me.canvas.setCapture(true);
 
@@ -263,21 +265,22 @@ if( typeof Daisy === 'undefined')
 			});
 			$.addEvent(this.canvas, "dblclick", function(e) {
 				var p = me._getEventPoint(e);
-				me.checkWord(p.x, p.y);
+				//me.checkWord(p.x, p.y);
 			});
 			$.addEvent(this.caret, "dblclick", function(e) {
-				var p = this._getEventPoint(e);
-				me.checkWord(this.offsetLeft + p.x, this.offsetTop + p.y);
+				var p = me._getEventPoint(e);
+				//me.checkWord(this.offsetLeft + p.x, this.offsetTop + p.y);
 			});
 			$.addEvent(this.canvas, 'mouseup', function(e) {
 				// $.log('mup');
 				me.__mouse_down__ = false;
-				/**
-				 * todo 不应该每次重绘
-				 */
+				
 				me.render.paint();
-				if(me.canvas.setCapture)
-					me.canvas.setCapture(false);
+				
+					
+				if(me.canvas.releaseCapture)
+					me.canvas.releaseCapture();
+					
 				e.stopPropagation();
 			});
 
@@ -290,17 +293,14 @@ if( typeof Daisy === 'undefined')
 					me._setCaret(pos);
 					var from = me.__down_pos__, to = pos;
 					if(from.line === to.line && from.colum === to.colum && me.select_mode === true) {
-						//me.select_mode = false;
-						$.log("select nothing");
 						me.doc.select(null);
 						break out_if;
 					} else if(from.line > to.line || (from.line === to.line && from.colum > to.colum)) {
 						from = pos;
 						to = me.__down_pos__;
-						//$.log(from);
-						//$.log(to);
+						
 					}
-					$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
+					//$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
 					me.doc.select(from, to);
 					
 					me.render.paint();
@@ -340,7 +340,8 @@ if( typeof Daisy === 'undefined')
 				e.stopPropagation();
 			});
 
-			$.addEvent(this.canvas, 'focus', function(e) {
+			$.addEvent(this.canvas, 'mouseup', function(e) {
+				//$.log('focus')
 				me.focused = true;
 				me.caret.focus();
 				if(me.caretTextChange==null){
@@ -350,19 +351,20 @@ if( typeof Daisy === 'undefined')
 							var cur_text = me.caret.value;
 							if(cur_text !== pre_text) {
 								me.insertText(cur_text);
-								//$.log(cur_text);
+								$.log(cur_text);
 								pre_text = "";
 								me.caret.value = "";
 							}
 						}, 100);
 					})();
-				}
+				} 
 			});
 			$.addEvent(this.caret, 'blur', function(e) {
 				/**
 				 * hack. 下面条件满足则表明光标的焦点失去，并且不在canvas上，
 				 *       即整个editor失去焦点。
 				 */
+				//$.log('blur');
 				if(e.explicitOriginalTarget !== me.canvas) {
 					me.focused = false;
 					if(me.caretTextChange!=null){
@@ -371,11 +373,8 @@ if( typeof Daisy === 'undefined')
 					}
 				}
 			});
-
-			$.addEvent(this.caret, 'keypress', function(e) {
+			$.addEvent(this.caret,"keydown",function(e){
 				//$.log(e);
-				//var f_t = new Date().getTime();
-				
 				switch(e.keyCode) {
 					case 13:
 						//回车
@@ -416,18 +415,27 @@ if( typeof Daisy === 'undefined')
 						//向下
 						me.moveCaret("down");
 						break;
-					default:
+				}
+				//e.preventDefault();
+			});
+			 
+			$.addEvent(this.caret, 'keypress', function(e) {
+				//$.log(e);
+				//var f_t = new Date().getTime();
+				
+				
 						if(e.charCode > 0) {
 							me.doc.insertChar(String.fromCharCode(e.charCode), me.caret_position);
 							me.rightCaret(me.caret_position);
 							me.render.paint();
 						}
-				}
+			
 				//jQuery.dprint("key time:%d",new Date().getTime()-f_t);
 				e.preventDefault();
 				
 			});
 
+			
 			$.addEvent(this.right_scroll, "scroll", function(e) {
 
 				//$.log(this.scrollTop);

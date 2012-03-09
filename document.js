@@ -67,6 +67,7 @@ Daisy._Document.prototype = {
 	 * caret: 游标，通常由editor传入this.caret_position.
 	 */
 	insertChar : function(chr, caret) {
+		this.select_mode = false;
 		/**
 		 * 注意这个地方的实际增加和lex操作要放在最前面。
 		 * 因为getTextWidth_2是依赖lex之后的style_array的，
@@ -93,6 +94,7 @@ Daisy._Document.prototype = {
 
 	},
 	insertLine : function(caret) {
+		this.select_mode = false;
 		this.text_array.splice(caret.index + 1, 0, '\n');
 		this.style_array.splice(caret.index + 1, 0, 0);
 		
@@ -212,20 +214,21 @@ Daisy._Document.prototype = {
 		}
 	},
 	_deleteSelect : function() {
+		
 		var f = this.select_range.from, t = this.select_range.to;
-		var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
-
-		var len = t.index - f.index;
-		for(var i = t.line + 1; i < this.line_number; i++) {
-			this.line_info[i].start -= len;
-		}
+		// var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
+// 
+		// var len = t.index - f.index;
+		// for(var i = t.line + 1; i < this.line_number; i++) {
+			// this.line_info[i].start -= len;
+		// }
 		/**
 		 * to do...
 		 */
 		this.select_mode = false;
 		return {
-			line : 0,
-			colum : 0
+			line : f.line,
+			colum : f.colum
 		}
 	},
 	del : function(caret) {
