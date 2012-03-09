@@ -6,10 +6,13 @@ $(function(){
 		theme : Daisy.Theme.Daisy
 	});
 	
+	$.get("https://raw.github.com/YuhangGe/daisy-editor/master/daisy-editor.txt",function(data){
+		 d_editor.appendText(data);
+	})
 });
 
 function load_jquery(){
-	 $.get("j-1.5.1.txt",function(data){
+	 $.get("https://raw.github.com/YuhangGe/daisy-editor/master/j-1.5.1.txt",function(data){
 		 d_editor.appendText(data);
 	 })
 }
