@@ -5,3 +5,5 @@ bug. ie 9 和 chrome 下面打开中文输入法后有问题。
 todo. 删除选中的整段文字。
 
 todo. 在某个位置插入整段文字。
+
+todo. chrome下面没有setcapture函数。
