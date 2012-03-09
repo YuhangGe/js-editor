@@ -392,6 +392,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 9:
 						me.insertText("    ");
+				 e.preventDefault();
 						break;
 					case 46:
 						//del键
