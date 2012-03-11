@@ -2,6 +2,4 @@ bug. ie 9 下面鼠标点击后的光标位置错误。（但使用键盘移动�
 
 bug. ie 9 和 chrome 下面打开中文输入法后有问题。
 
-todo. 在某个位置插入整段文字。
-
 todo. chrome下面没有setcapture函数。
