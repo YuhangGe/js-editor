@@ -216,16 +216,27 @@ Daisy._Document.prototype = {
 	_deleteSelect : function() {
 		
 		var f = this.select_range.from, t = this.select_range.to;
-		// var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
+		var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
 // 
-		// var len = t.index - f.index;
-		// for(var i = t.line + 1; i < this.line_number; i++) {
-			// this.line_info[i].start -= len;
-		// }
-		/**
-		 * to do...
-		 */
+		
+		var len = t.index - f.index;
+		this.text_array.splice(f.index+1,len);
+		this.style_array.splice(f.index+1,len);
+		for(var i = t.line + 1; i < this.line_number; i++) {
+			this.line_info[i].start -= len;
+		}
+		if(f_l===t_l){
+			this.line_info[f_l].length -= len;
+		}else{
+			this.line_info[f_l].length = f_colum + this.line_info[t_l].length- t_colum; 
+			this.line_info.splice(f_l+1,t_l-f_l);
+			this.line_number-=t_l-f_l;
+			this.editor.render.resetRenderHeight();
+		}
+		this.editor.render.resetRegion();
+		this._doLex([f_l]);
 		this.select_mode = false;
+		//$.log(this.line_info)
 		return {
 			line : f.line,
 			colum : f.colum
