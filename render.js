@@ -233,6 +233,7 @@ if( typeof Daisy === 'undefined')
 				this.doc._findMaxWidthLine();
 				this.resetRenderWidth();
 			}
+			
 		},
 		paint : function() {
 

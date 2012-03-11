@@ -378,11 +378,8 @@ if( typeof Daisy === 'undefined')
 				switch(e.keyCode) {
 					case 13:
 						//回车
-						var new_pos = me.doc.insertLine(me.caret_position);
-
-						me._moveCaret_lc(new_pos.line, new_pos.colum);
-						me.render.paint();
-						//$.log(me.doc.line_info);
+						me.insertText("\n");
+						 
 						break;
 					case 8:
 						//退格（删除）
@@ -426,9 +423,7 @@ if( typeof Daisy === 'undefined')
 				
 				
 						if(e.charCode > 0) {
-							me.doc.insertChar(String.fromCharCode(e.charCode), me.caret_position);
-							me.rightCaret(me.caret_position);
-							me.render.paint();
+							me.insertText(String.fromCharCode(e.charCode));
 						}
 			
 				//jQuery.dprint("key time:%d",new Date().getTime()-f_t);
@@ -609,19 +604,8 @@ if( typeof Daisy === 'undefined')
 				return this.CHAR_TYPE.UNICODE;
 		},
 		insertText : function(text) {
-			/**
-			 * 当前版本暂时拆分成单个字符插入。这样在插入少量文本时会有问题，暂时不考虑。
-			 * 下个版本会在document.js中的Document类中实现insert插入函数，不会再有性能问题。
-			 */
-			for(var i=0;i<text.length;i++){
-				var c = text[i],new_pos = null;
-				if(c==='\n'){
-					new_pos = this.doc.insertLine(this.caret_position);
-				}else{
-					new_pos = this.doc.insertChar(c,this.caret_position);
-				}
-				this._moveCaret_lc(new_pos.line, new_pos.colum);
-			}
+			var new_pos = this.doc.insert(text,this.caret_position);
+			this._moveCaret_lc(new_pos.line, new_pos.colum);
 			this.render.paint();
 			
 			//$.log("insert:"+text);
@@ -703,29 +687,12 @@ if( typeof Daisy === 'undefined')
 
 			return idx;
 		},
-	
-		/**
-		 * 键盘delete按键对应的操作
-		 */
-		del : function() {
-			var c = this.caret_position, start = c.index + 1, length = 1, line = c.line, colum = c.colum;
-			if(start === this.text_array.length)
-				return;
-			if(this.select_mode) {
-				var f = this.select_range.from, t = this.select_range.to;
-				start = f.index + 1;
-				length = t.index - f.index;
-				line = f.line;
-				colum = f.colum;
-				this.select_mode = false;
-			}
-			this._delete(start, length);
-			this._moveCaret_lc(line, colum);
-			this.render.paint();
-		},
 		appendText : function(text) {
 			this.doc.append(text);
 			this.render.paint();
+		},
+		focus : function(){
+			this.caret.focus();
 		}
 	}
 

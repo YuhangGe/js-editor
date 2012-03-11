@@ -63,80 +63,68 @@ Daisy._Document.prototype = {
 	},
 	/**
 	 * 在传入游标位置处插入文本。
-	 * str:
+	 * text:
 	 * caret: 游标，通常由editor传入this.caret_position.
 	 */
-	insertChar : function(chr, caret) {
-		this.select_mode = false;
-		/**
-		 * 注意这个地方的实际增加和lex操作要放在最前面。
-		 * 因为getTextWidth_2是依赖lex之后的style_array的，
-		 * 需要先lex才能具体得到增加的字符的宽度属性。
-		 */
-		this.text_array.splice(caret.index + 1, 0, chr);
-		this.style_array.splice(caret.index + 1, 0, 0);
-		//this.editor.lexer.lex();
+	insert : function(text, caret) {
 		
-		
-		for(var i = caret.line + 1; i < this.line_number; i++) {
-			this.line_info[i].start++;
+		var c_lines = [],del_num = 0,add_num = 0;
+		if(this.select_mode){
+			del_num = this._deleteSelect();
+			caret = this.select_range.from;
 		}
-		var cur_line = this.line_info[caret.line];
-		cur_line.check_width = true;
-		cur_line.length++;
+		c_lines.push(caret.line);
+		//$.log(this.line_info);
+		for(var i=0;i<text.length;i++){
+			this.text_array.splice(caret.index+1+i,0,text[i]);
+			this.style_array.splice(caret.index+1+i,0,0);
+		}		
+		var r_line,r_colum;
+		var f_l = caret.line,s_lines = text.split("\n"),line=this.line_info[f_l];
+		for(var i = f_l + 1; i < this.line_number; i++) {
+			this.line_info[i].start+=text.length;
+		}
+		if(s_lines.length===1){
+			line.length += s_lines[0].length;
+			line.check_width = true;
+			r_line = f_l;
+			r_colum = caret.colum+s_lines[0].length;
+		}else{
+			var r_len = line.length - caret.colum - 1;
+			line.length = caret.colum+1+s_lines[0].length;
+			line.check_width = true;
+			for(var i=1;i<s_lines.length;i++){
+				//$.log(s_lines[i]);
+				line = {
+					start : line.start+line.length+1,
+					length : s_lines[i].length,
+					width : 0,
+					check_width : true
+				}
+				if(i===s_lines.length-1){
+					line.length += r_len;
+				}
+				this.line_info.splice(f_l+i,0,line);
+				c_lines.push(f_l+i);
+			}
+			this.line_number+=s_lines.length-1;
+			add_num = s_lines.length - 1;
+			r_line = f_l + add_num;
+			r_colum = s_lines[s_lines.length-1].length-1;
+		}
 		
+		if(add_num!==del_num)
+			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
-		this._doLex([caret.line]);
-		return {
-			line : caret.line,
-			colum : caret.colum + 1
-		}
-
-	},
-	insertLine : function(caret) {
-		this.select_mode = false;
-		this.text_array.splice(caret.index + 1, 0, '\n');
-		this.style_array.splice(caret.index + 1, 0, 0);
 		
-		var cur_line = this.line_info[caret.line], ls = cur_line.start + 1, le = ls + caret.colum, rs = le + 1, re = cur_line.start + cur_line.length;
-
-		var n_s = 0, n_l = 0, n_w = 0, n_i = caret.line + 1;
-		if(le < 0) {
-			//在行首插入新行，如果当前行是空行，也会执行到此。
-			n_s = cur_line.start;
-			n_i--;
-		} else if(re < rs) {
-			//在行末插入新行
-			n_s = rs;
-		} else {
-			//在一行的中间插入
-			n_s = le + 1;
-			n_l = re - rs + 1;
-			cur_line.check_width = true;
-			cur_line.length = le - ls + 1;
-		}
-		var new_line = {
-			start : n_s,
-			length : n_l,
-			check_width : true
-		}
-		this.line_info.splice(n_i, 0, new_line);
-		this.line_number++;
-		for(var i = n_i + 1; i < this.line_number; i++) {
-			this.line_info[i].start++;
-		}
-		this.editor.render.resetRenderHeight();
-		this.editor.render.resetRegion();
-
-		this._doLex([caret.line,n_i]);
-
+		//$.log(c_lines);
+		this._doLex(c_lines);
+		
+		//$.log(this.line_info);
 		return {
-			line : caret.line + 1,
-			colum : -1
+			line:r_line,
+			colum:r_colum
 		}
-	},
-	insertText : function(text, caret) {
-		// to do...
 	},
 	append : function(str) {
 		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
@@ -145,9 +133,6 @@ Daisy._Document.prototype = {
 			this.text_array.push(str[i]);
 			this.style_array.push(0);
 		}
-		
-		
-		var lw = this.editor.render.getTextWidth_2(l, start_idx);
 		
 		last_line.length += l.length;
 		last_line.check_width = true;
@@ -191,14 +176,12 @@ Daisy._Document.prototype = {
 			r_line--;
 			r_colum = p_line.length - 1;
 			p_line.check_width = true;;
-			p_line.width += c_line.width;
+			p_line.length += c_line.length;
 			this.line_info.splice(line, 1);
 			this.line_number--;
 		} else {
-			var cw = this.editor.render.getTextWidth_2(this.text_array[index], index);
 			c_line.length--;
 			c_line.check_width = true;;
-		
 		}
 		if(colum<0)
 			this.editor.render.resetRenderHeight();
@@ -207,23 +190,35 @@ Daisy._Document.prototype = {
 		this.text_array.splice(index, 1);
 		this.style_array.splice(index, 1);
 		this._doLex([r_line]);
-
 		return {
 			line : r_line,
 			colum : r_colum
 		}
 	},
+	/**
+	 * 删除选中区域的文本，返回完全删除的行数（而不是受影响的行数，即如果选中的区域在一行中，则返回值为0）。
+	 */
 	_deleteSelect : function() {
 		
 		var f = this.select_range.from, t = this.select_range.to;
 		var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
-// 
-		
 		var len = t.index - f.index;
 		this.text_array.splice(f.index+1,len);
 		this.style_array.splice(f.index+1,len);
 		for(var i = t.line + 1; i < this.line_number; i++) {
 			this.line_info[i].start -= len;
+		}
+		this.line_info[f_l].check_width = true;
+		for(var i=f_l;i<=t_l;i++){
+			if(this.line_info[i]===this.max_width_line)
+			{
+				/**
+				 * 如果选中的行中有最宽行，则把最宽行设置为选中的第一行
+				 * 这样在Render的_check_width函数中就一定会执行到_findMaxWidthLine从而重新真正查找最宽行。
+				 */
+				this.max_width_line=this.line_info[f_l];
+				break;
+			}
 		}
 		if(f_l===t_l){
 			this.line_info[f_l].length -= len;
@@ -231,20 +226,23 @@ Daisy._Document.prototype = {
 			this.line_info[f_l].length = f_colum + this.line_info[t_l].length- t_colum; 
 			this.line_info.splice(f_l+1,t_l-f_l);
 			this.line_number-=t_l-f_l;
-			this.editor.render.resetRenderHeight();
+			
 		}
-		this.editor.render.resetRegion();
-		this._doLex([f_l]);
+	
 		this.select_mode = false;
-		//$.log(this.line_info)
-		return {
-			line : f.line,
-			colum : f.colum
-		}
+		
+		return t_l - f_l;
 	},
 	del : function(caret) {
 		if(this.select_mode) {
-			return this._deleteSelect();
+			if(this._deleteSelect()>0)
+				this.editor.render.resetRenderHeight();
+			this.editor.render.resetRegion();
+			this._doLex([this.select_range.from.line]);
+			return {
+				line : this.select_range.from.line,
+				colum : this.select_range.from.colum
+			}
 		}
 		if(caret.index === this.text_array.length - 1) {
 			return {
@@ -262,7 +260,14 @@ Daisy._Document.prototype = {
 	},
 	backspace : function(caret) {
 		if(this.select_mode) {
-			return this._deleteSelect();
+			if(this._deleteSelect()>0)
+				this.editor.render.resetRenderHeight();
+			this.editor.render.resetRegion();
+			this._doLex([this.select_range.from.line]);
+			return {
+				line : this.select_range.from.line,
+				colum : this.select_range.from.colum
+			}
 		}
 		if(caret.index === -1) {
 			return {

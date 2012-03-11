@@ -1,7 +1,7 @@
 $(function(){
 	d_editor = new Daisy._Editor({
-		width: 600,
-		height: 400,
+		width: 400,
+		height: 300,
 		lexer : Daisy.Lexer.JS,
 		theme : Daisy.Theme.Daisy
 	});
@@ -13,8 +13,8 @@ $(function(){
 	
 	//d_editor.appendText(s2);
 	//do_test();
-	d_editor.appendText("abc\ndef\n/* 我爱\t小扬 */\n\n\nbedc\ndef");
-	//d_editor.appendText("abc");
+	//d_editor.appendText("abc\ndef\n/* 我爱\t小扬 */aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\nbedddc\ndedddddddddddddddf");
+	d_editor.appendText("abc\ndef\n");
 	//d_editor.appendText("/* love 葛 daisy */\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n//hello world\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
 	//$.log(d_editor.doc.line_info);
 	//for(var i=0;i<10;i++)
@@ -34,6 +34,10 @@ function do_test(){
 	//d_editor.render.scrollTop(380);
 	//d_editor.setFontName("楷体");
 	//d_editor.appendString("0123\n0123\n\n0123")
+}
+function insert(){
+	d_editor.insertText("123\n456\nvar a = 10.99;\n");
+	d_editor.focus();
 }
 $.$ = function(id){
 	return document.getElementById(id);
