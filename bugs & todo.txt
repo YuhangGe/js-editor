@@ -2,4 +2,13 @@ bug. ie 9 下面鼠标点击后的光标位置错误。（但使用键盘移动�
 
 bug. ie 9 和 chrome 下面打开中文输入法后有问题。
 
+bug ie9下回车会多一个空格。
+
+bug 正则表达式的高亮错误（/jsljsdl/jksl/这样的中间/符不被认为是结束）
+
+todo 其它语言高亮、其它主题。demo页面。
+
 todo. chrome下面没有setcapture函数。
+
+todo. 复制粘贴查找。
+

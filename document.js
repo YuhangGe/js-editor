@@ -358,4 +358,94 @@ Daisy._Document.prototype = {
 
 		this.editor.lexer.lex(lines);
 	},
+	/**
+		 * 选中当前光标所在的单词
+		 */
+		selectWord : function(x, y) {
+			var c = this.editor.caret_position, line = this.line_info[c.line];
+			if(line.length === 0)
+				return;
+
+			var i = this._getCharIndex(x, y), chr = this.text_array[i];
+			if(chr === '\n') {
+				i--;
+				chr = this.text_array[i];
+			}
+			var chr_type = this._getCharType(chr);
+
+			var l = i - 1, r = i + 1, e = this.text_array.length - 1;
+			while(l >= 0 && this._getCharType(this.text_array[l]) === chr_type)
+			l--;
+			while(r <= e && this._getCharType(this.text_array[r]) === chr_type)
+			r++;
+
+			//$.log("check word:"+i+","+l+","+(r-1));
+			return this.selectByIndex(l, r - 1);
+		},
+		/**
+		 * 选定从from所在字符后的一个字符到to所在的字符，注意没有包括from所在字符，
+		 * from如果为-1代表从第一个字符开始选取。
+		 */
+		selectByIndex : function(from, to) {
+			var fc = this.getCaretByIndex(from), tc = this.getCaretByIndex(to);
+			//this._setCaret(tc);
+			this.select_mode = true;
+			this.select_range.from = fc;
+			this.select_range.to = tc;
+			//this.render.paint();
+			return fc;
+		},
+		/**
+		 * 得到index所指字符的右边位置的游标caret位置。
+		 * 如果index为 -1，则返回第一个字符的左边位置，即文本最前端位置
+		 * 如果index超过text_array的大小，则返回文本最末端位置
+		 */
+		getCaretByIndex : function(index) {
+			if(index === -1)
+				return {
+					line : 0,
+					colum : -1,
+					index : -1,
+					left : 0,
+					top : 0
+				};
+			for(var i = 0; i < this.line_number; i++) {
+				var line = this.line_info[i];
+				if(line.start + line.length >= index) {
+					return this._getCaret_lc(i, index - line.start - 1);
+				}
+			}
+		},
+		/**
+		 * 得到坐标x,y处的字符索引.算法和_getCaret_xy类似，但不一样的在于，
+		 * _getCaret_xy是返回x,y处字符对应的游标(caret)位置。
+		 */
+		_getCharIndex : function(x, y) {
+			var row = Math.floor(y / this.editor.render.line_height),
+			 row = row > this.line_number - 1 ? this.line_number - 1 : row,
+			  line = this.line_info[row], left = 0,
+			   idx = line.start;
+
+			if(line.length > 0) {
+				idx = line.start + 1;
+				var e = idx + line.length;
+				for(; idx < e; idx++) {
+					left += this.editor.render.getTextWidth_2(this.text_array[idx],idx);
+					if(left >= x)
+						break;
+				}
+			}
+
+			return idx;
+		},
+		_getCharType : function(c) {
+			if(/[0-9a-zA-Z_]/.test(c))
+				return this.CHAR_TYPE.WORD;
+			else if(c === ' ' || c === '\t')
+				return this.CHAR_TYPE.SPACE;
+			else if(c < '\xff')
+				return this.CHAR_TYPE.ASCII;
+			else
+				return this.CHAR_TYPE.UNICODE;
+		}
 }
