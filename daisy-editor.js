@@ -21,10 +21,18 @@ if( typeof Daisy === 'undefined')
 	Daisy = {};
 (function(Daisy) {
 	var $$ = jQuery;
-	
+
 	var $ = function(id) {
 		return document.getElementById(id);
 	}
+	var ua = navigator.userAgent.toLowerCase();
+    var s;
+    (s = ua.match(/msie ([\d.]+)/)) ? $.ie = s[1] :
+    (s = ua.match(/firefox\/([\d.]+)/)) ? $.firefox = s[1] :
+    (s = ua.match(/chrome\/([\d.]+)/)) ? $.chrome = s[1] :
+    (s = ua.match(/opera.([\d.]+)/)) ? $.opera = s[1] :
+    (s = ua.match(/version\/([\d.]+).*safari/)) ? $.safari = s[1] : 0;
+
 	$.log = function(msg) {
 		if(console.log) {
 			console.log(msg);
@@ -46,6 +54,18 @@ if( typeof Daisy === 'undefined')
 			ele.removeEventListener(event, handler);
 		} else {
 			ele.detachEvent('on' + event, handeler);
+		}
+	}
+	$.stopEvent = function(e) {
+		if(e.preventDefault) {
+			e.preventDefault();
+		} else {
+			e.returnValue = false;
+		}
+		if(e.stopPropagation) {
+			e.stopPropagation();
+		} else {
+			e.cancelBubble = true;
 		}
 	}
 	$.addWheelEvent = function(ele, handler) {
@@ -105,6 +125,7 @@ if( typeof Daisy === 'undefined')
 		this.focused = false;
 
 		this.canvas = $('d-canvas');
+		 
 		this.ctx = this.canvas.getContext('2d');
 		this.container = $('d-editor');
 		this.client = $('d-client');
@@ -119,17 +140,18 @@ if( typeof Daisy === 'undefined')
 		this.scroll_left = 0;
 
 		this.doc = new Daisy._Document(this);
-		this.lexer = new Daisy._LexerManager(this,_lexer);
+		this.lexer = new Daisy._LexerManager(this, _lexer);
 		this.render = new Daisy._Render(this);
 
 		this._setSize();
 
 		this.caret.style.height = this.render.line_height + "px";
 		this.caret.style.font = this.theme.font;
-		this.caret.style.color = this.theme.caret_color;
+		this.caret.style.color =  this.theme.caret_color;
+		
 		//this.right_scroll.style.background = this.theme.background;
 		//this.bottom_scroll.style.background = this.theme.background;
-		
+
 		this.palette = {
 			keys : {},
 			values : []
@@ -159,7 +181,7 @@ if( typeof Daisy === 'undefined')
 					j++;
 				}
 			}
-			if(this.palette.keys['default']==null){
+			if(this.palette.keys['default'] == null) {
 				throw "主题缺少默认样式！";
 			}
 		},
@@ -194,12 +216,12 @@ if( typeof Daisy === 'undefined')
 
 			this.container.style.width = this.width + "px";
 			this.container.style.height = this.height + "px";
-			var l = this.canvas_width , r = this.canvas_height ;
-			this.right_scroll.style.left = (l)+"px";
-			this.right_scroll.style.height = (r)+"px";
+			var l = this.canvas_width, r = this.canvas_height;
+			this.right_scroll.style.left = (l) + "px";
+			this.right_scroll.style.height = (r) + "px";
 			this.right_scroll.style.width = this.SCROLL_WIDTH + 'px';
-			this.bottom_scroll.style.width = (l)+"px";
-			this.bottom_scroll.style.top = (r)+"px";
+			this.bottom_scroll.style.width = (l) + "px";
+			this.bottom_scroll.style.top = (r) + "px";
 			this.bottom_scroll.style.height = this.SCROLL_WIDTH + 'px';
 			this.right_scroll.scrollTop = 0;
 			this.bottom_scroll.scrollLeft = 0;
@@ -257,9 +279,10 @@ if( typeof Daisy === 'undefined')
 				me.__mouse_down__ = true;
 				me.__pre_pos__ = me.caret_position;
 				me.__down_pos__ = me.caret_position;
-				
+
 				if(me.canvas.setCapture)
 					me.canvas.setCapture(true);
+				 
 
 				//$.log(me.caret_position);
 			});
@@ -278,23 +301,21 @@ if( typeof Daisy === 'undefined')
 				me.render.paint();
 			});
 			$.addEvent(this.canvas, 'mouseup', function(e) {
-				// $.log('mup');
+				//$.log('mup 1');
 				me.__mouse_down__ = false;
-				
+
 				me.render.paint();
-				
-					
+
 				if(me.canvas.releaseCapture)
 					me.canvas.releaseCapture();
-					
-				e.stopPropagation();
-				e.preventDefault();
+				 
+				//$.stopEvent(e);
 			});
 
 			$.addEvent(this.canvas, 'mousemove', function(e) {
 				if(!me.__mouse_down__)
 					return;
-				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y); 
+				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y);
 				out_if:
 				if(pos.line !== me.__pre_pos__.line || pos.colum !== me.__pre_pos__.colum) {
 					me._setCaret(pos);
@@ -305,11 +326,11 @@ if( typeof Daisy === 'undefined')
 					} else if(from.line > to.line || (from.line === to.line && from.colum > to.colum)) {
 						from = pos;
 						to = me.__down_pos__;
-						
+
 					}
 					//$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
 					me.doc.select(from, to);
-					
+
 					me.render.paint();
 					me.__pre_pos__ = pos;
 				}
@@ -344,27 +365,14 @@ if( typeof Daisy === 'undefined')
 					//$.log("sdown:"+dd);
 				}
 
-				e.stopPropagation();
+				$.stopEvent(e);
 			});
 
 			$.addEvent(this.canvas, 'mouseup', function(e) {
 				//$.log('focus')
 				me.focused = true;
 				me.caret.focus();
-				if(me.caretTextChange==null){
-					(function(){
-						var pre_text = "";
-						me.caretTextChange = window.setInterval(function() {
-							var cur_text = me.caret.value;
-							if(cur_text !== pre_text) {
-								me.insertText(cur_text);
-								$.log(cur_text);
-								pre_text = "";
-								me.caret.value = "";
-							}
-						}, 100);
-					})();
-				} 
+
 			});
 			$.addEvent(this.caret, 'blur', function(e) {
 				/**
@@ -374,19 +382,19 @@ if( typeof Daisy === 'undefined')
 				//$.log('blur');
 				if(e.explicitOriginalTarget !== me.canvas) {
 					me.focused = false;
-					if(me.caretTextChange!=null){
-						window.clearInterval(me.caretTextChange);
-						me.caretTextChange = null;
-					}
 				}
 			});
-			$.addEvent(this.caret,"keydown",function(e){
+			$.addEvent(this.caret, "keydown", function(e) {
+				//$.log(e.ctrlKey);
 				//$.log(e.keyCode);
 				switch(e.keyCode) {
 					case 13:
 						//回车
 						me.insertText("\n");
-						 
+						/**
+				 		 * 在ie下面要stopEvent，让keypress不要触发，否则回车会多一个\r。由于不影响其它浏览器，统一stopEvent.
+				 		 */
+						$.stopEvent(e);
 						break;
 					case 8:
 						//退格（删除）
@@ -396,7 +404,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 9:
 						me.insertText("    ");
-				 		e.preventDefault();
+						
 						break;
 					case 46:
 						//del键
@@ -420,25 +428,42 @@ if( typeof Daisy === 'undefined')
 						//向下
 						me.moveCaret("down");
 						break;
-				}
-				//e.preventDefault();
-			});
-			 
-			$.addEvent(this.caret, 'keypress', function(e) {
-				//$.log(e.charCode);
-				//var f_t = new Date().getTime();
-				
-				
-						if(e.charCode > 0) {
-							me.insertText(String.fromCharCode(e.charCode));
+					case 67:
+						if(e.ctrlKey && ($.ie||$.firefox))
+						{
+							$.log("copy")
+							me.copyText();
+							$.stopEvent(e);
 						}
+						break;
+					case 88:
+						if(e.ctrlKey && ($.ie||$.firefox))
+						{
+							
+							me.cutText();
+							$.stopEvent(e);
+						}
+						break;
+				}
+			});
 			
+			$.addEvent(this.caret, 'input', function(e) {
+			//	$.log(e);
+				//var f_t = new Date().getTime();
+
+				//if(e.charCode > 0) {
+				if(this.value!==""){
+					//$.log(this.value);
+					me.insertText(this.value);
+					this.value = "";
+				}
+				//}
+				//this.select();
 				//jQuery.dprint("key time:%d",new Date().getTime()-f_t);
-				e.preventDefault();
-				
+				$.stopEvent(e);
+
 			});
 
-			
 			$.addEvent(this.right_scroll, "scroll", function(e) {
 
 				//$.log(this.scrollTop);
@@ -464,7 +489,20 @@ if( typeof Daisy === 'undefined')
 					//me._resetCaret();
 				}
 			});
-
+			$.addEvent(this.caret, 'copy', function(e) {
+			 
+				me.copyText(e);
+				$.stopEvent(e);
+			});
+			$.addEvent(this.caret, 'cut', function(e) {
+				me.cutText(e);
+				$.stopEvent(e);
+			});
+			/*
+			$.addEvent(this.caret, 'paste', function(e) {
+				//不需要处理，因为caret是input，可以自动完成
+			});
+			*/
 			$.addWheelEvent(this.canvas, function(e) {
 				//e=window.event|e;
 
@@ -475,8 +513,8 @@ if( typeof Daisy === 'undefined')
 					delta = -e.detail;
 				}
 				//$.log(delta);
-				me.scrollTop(me.scroll_top - delta*10);
-				
+				me.scrollTop(me.scroll_top - delta * 10);
+
 				if(e.stopPropagation) {
 					e.stopPropagation();
 				} else {
@@ -489,6 +527,26 @@ if( typeof Daisy === 'undefined')
 				}
 
 			});
+		},
+		copyText : function(e){
+			
+			if($.firefox){
+				alert("对不起，firefox不能实现复制。请使用ie9或者chrome.")
+				return;
+			}
+			var clip = $.ie?window.clipboardData:e.clipboardData;
+			clip.setData("text","i love daisy");
+			$.log('copy');
+		},
+		cutText : function(e){
+			
+			if($.firefox){
+				alert("对不起，firefox不能实现剪切。请使用ie9或者chrome.")
+				return;
+			}
+			var clip = $.ie?window.clipboardData:e.clipboardData;
+			clip.setData("text","i love daisy");
+			$.log("cut")
 		},
 		_scrollUp : function(d) {
 			if(this.scroll_top > 0)
@@ -600,21 +658,19 @@ if( typeof Daisy === 'undefined')
 		upCaret : function(c) {
 			this._moveCaret_xy(c.left, c.top - this.render.line_height);
 		},
-		
 		insertText : function(text) {
-			var new_pos = this.doc.insert(text,this.caret_position);
+			var new_pos = this.doc.insert(text, this.caret_position);
 			this._moveCaret_lc(new_pos.line, new_pos.colum);
 			this.render.paint();
-			
+
 			//$.log("insert:"+text);
-			
+
 		},
-		
 		appendText : function(text) {
 			this.doc.append(text);
 			this.render.paint();
 		},
-		focus : function(){
+		focus : function() {
 			this.caret.focus();
 		}
 	}
