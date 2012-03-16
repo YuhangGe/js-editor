@@ -346,6 +346,9 @@ Daisy._Document.prototype = {
 		this.select_range.to = to;
 		this.select_mode = true;
 	},
+	selectAll : function(){
+		return this.selectByIndex(-1,this.text_array.length-1);
+	},
 	_findMaxWidthLine : function() {
 		var i = 0, m_l = this.line_info[i];
 		for(i++; i < this.line_info.length; i++) {

@@ -428,6 +428,13 @@ if( typeof Daisy === 'undefined')
 						//向下
 						me.moveCaret("down");
 						break;
+					case 65:
+						if(e.ctrlKey){
+							me._setCaret(me.doc.selectAll());
+							me.render.paint();
+							$.stopEvent(e);
+						}
+						break;
 					case 67:
 						if(e.ctrlKey && ($.ie||$.firefox))
 						{
@@ -505,31 +512,26 @@ if( typeof Daisy === 'undefined')
 			*/
 			$.addWheelEvent(this.canvas, function(e) {
 				//e=window.event|e;
-
+				
 				var delta = 0;
 				if(e.wheelDelta) {
 					delta = e.wheelDelta / 120;
 				} else if(e.detail) {
 					delta = -e.detail;
 				}
-				//$.log(delta);
+				/*
+				 * 滚动到底或者顶时，不需要 event.preventDefault()。这样可以使用户可以继续在浏览器中滚动。
+				 */
+				if(delta>0 && me.scroll_top===0 || delta<0 && me.scroll_top === me.render.max_scroll_top)
+					return;
+				 
 				me.scrollTop(me.scroll_top - delta * 10);
-
-				if(e.stopPropagation) {
-					e.stopPropagation();
-				} else {
-					e.cancelBubble = true;
-				}
-				if(e.preventDefault) {
-					e.preventDefault();
-				} else {
-					e.returnValue = false;
-				}
-
+				$.stopEvent(e);
+				
 			});
 		},
 		copyText : function(e){
-			
+		
 			if($.firefox){
 				alert("对不起，firefox不能实现复制。请使用ie9或者chrome.")
 				return;

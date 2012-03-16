@@ -1,16 +1,12 @@
 ﻿bug. chrome 下面打开中文输入法后有问题（拼音总是会出现在input中，会触发input事件，暂时没有办法处理哎）。
 
-bug 正则表达式的高亮错误（/jsljsdl/jksl/这样的中间/符不被认为是结束）
-
-bug. firefox 不能实现复制和剪切功能。（这个是由于firefox本身的限制，目前没有办法解决）
+bug. firefox 不能实现复制和剪切功能。（这个是由于firefox本身的限制，目前只能实现伪剪贴板，即只在当前编辑器里可以复制粘贴）
 
 todo 目前的滚动条的实现有问题，原生的滚动条宽度在不同分辨率的显示器上不兼容。同时不能自己改变滚动条颜色风格，考虑自己重写实现。
 
-todo .滚动到底或者顶时，不需要 event.preventDefault()。这样可以使用户可以继续在浏览器中滚动。
-
 todo 其它语言高亮、其它主题。demo页面。
 
-todo. chrome下面没有setcapture函数。
+todo. chrome下面没有setcapture函数。(暂时没办法实现）
 
 todo. 查找替换。
 

@@ -4,7 +4,7 @@ if(typeof Daisy.Theme === 'undefined')
 	Daisy.Theme = {};
 	/dsdsd/g
 	A=10;
-(function(D,T){
+(function(D,T){  
 	T.Daisy = {
 		font : '20px consolas',
 		background : 'black',
@@ -18,13 +18,15 @@ if(typeof Daisy.Theme === 'undefined')
 		
 		styles : {
 			'default' : {color:'white'},
-			'keyword' : {color:'#cda869'},
-			'value' : {color:'#D16F52'},
+			'keyword' : {color:'#F9EE98'},
+			'value' : {color:'#B4431F'},
 			'comment' : {color: '#5f5a60', italic : true},
 			'operator': {color: '#CDA869'},
 			'string' : {color:'#8f9d6a'},
-			'regexp' : {color:'#8000ff',bold:true},
-			'id' : {color:'white'}			
+			'regexp' : {color:'#E9C062',bold:true},
+			'id' : {color:'white'},
+			'object' : {color:'#9E89A0'}	,
+			'param' : {color:'#7587A6',italic:true}	
 		}
 	}
 })(Daisy,Daisy.Theme);
