@@ -112,7 +112,6 @@ if( typeof Daisy.Lexer === 'undefined')
 							 * 如果action>=0，说明该状态为accept状态。
 							 */
 							pre_action = action;
-							$.log('pa'+action);
 							pre_act_len = yylen;
 						}
 					}
