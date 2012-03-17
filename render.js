@@ -164,7 +164,7 @@ if( typeof Daisy === 'undefined')
 				e_colum = t.colum
 			}
 
-			this.ctx.fillStyle = this.theme.selection.background;
+			this.ctx.fillStyle = this.theme.select_bg;
 
 			if(s === e) {
 
@@ -210,7 +210,7 @@ if( typeof Daisy === 'undefined')
 			//$.log(c_l)
 			if(c_l >= this.region.start_line && c_l <= this.region.end_line) {
 				//$.log(c_l);
-				this.ctx.fillStyle = this.theme.current_line.background;
+				this.ctx.fillStyle = this.theme.cur_line_bg;
 				this.ctx.fillRect(0, c_l * this.line_height - this.region.top, this.buffer_width, this.line_height);
 			}
 		},
@@ -285,6 +285,7 @@ if( typeof Daisy === 'undefined')
 						var cw = this.ctx.measureText(seg).width;
 						if(left+cw>0){
 							this.ctx.fillStyle = this.styles[pre_c].color;
+							//$.log(this.styles[pre_c]);
 							this.ctx.fillText(seg,left,top);
 						}
 						l_s = idx;

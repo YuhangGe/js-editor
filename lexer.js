@@ -30,10 +30,11 @@ Daisy.Lexer.Help = {
 	}
 }
 
-Daisy._LexerManager = function(editor,lexer){
+Daisy._LexerManager = function(editor){
 	this.DELAY_LEN = 100000;
 	this.editor = editor;
-	this.lexer = new lexer(editor);
+	this.lexer_hash = {};
+	this.lexer = null;
 	this.busy_work = null;
 	this.wait = false;
 	this.check_line = [];
@@ -41,6 +42,11 @@ Daisy._LexerManager = function(editor,lexer){
 	//this.lexer_worker.onmessage = this.onlexer;
 }
 Daisy._LexerManager.prototype = {
+	setLexer : function(name){
+		if(this.lexer_hash[name]==null)
+			this.lexer_hash[name]=new Daisy.Lexer[name](this.editor);
+		this.lexer = this.lexer_hash[name];
+	},
 	_delayLex : function(lines){
 		var me = this;
 		if(lines!=null)
@@ -92,4 +98,5 @@ Daisy._LexerManager.prototype = {
 			this._delayLex(lines);
 		}
 	}
+	
 }

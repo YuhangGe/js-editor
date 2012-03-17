@@ -9,8 +9,11 @@
         <script type="text/javascript" src="document.js"></script>
         <script type="text/javascript" src="render.js"></script>
         <script type="text/javascript" src="lexer.js"></script>
-        <script type="text/javascript" src="theme/daisy.js"></script>
+        <script type="text/javascript" src="clipboard.js"></script>
+        <script type="text/javascript" src="theme/aptana3.js"></script>
+        <script type="text/javascript" src="theme/notepadplusplus.js"></script>
         <script type="text/javascript" src="lexer/javascript.js"></script>
+        <script type="text/javascript" src="lexer/visualbasic.js"></script>
         <script type="text/javascript" src="sample.js"></script>
     
     	<style type="text/css">
@@ -18,7 +21,7 @@
     			margin:0px;
     			padding:0px;
     		}
-    		#e-canvas,#d-canvas{
+    		#d-canvas{
     			cursor: text;
     			margin: 0px;
     			outline: none;
@@ -27,7 +30,7 @@
     			top: 0px;
     		}
     		
-    		#e-parent,#d-editor{
+    		#d-editor{
     			width: 425px;
     			height: 378px;
     			padding: 0px;
@@ -44,7 +47,7 @@
     			left : 0px;
     			top : 0px;
     		}
-    		#e-caret, #d-caret{
+    		#d-caret{
     			position:absolute;
     			display:block;
     			width:1px;
@@ -56,6 +59,10 @@
     			outline:none;
     			border:none;
     			resize:none;
+    			/*
+    			 * important! overflow hidden in chrome
+    			 */
+    			overflow: hidden;
     		}
     		#d-rightscroll {
     			position: absolute;
@@ -134,7 +141,7 @@
 		      			<div id="d-client">
 		      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
 		      			</div>
-		      			<input type="text" id="d-caret" />
+		      			<textarea cols="0" rows="0" spellcheck="false" id="d-caret" ></textarea>
 		      			<div id="d-rightscroll"><div id="d-rightscroll-body"></div></div>
 		      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
 		      			

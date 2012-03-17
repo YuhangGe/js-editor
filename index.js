@@ -2,8 +2,8 @@ $(function(){
 	d_editor = new Daisy._Editor({
 		width: 400,
 		height: 300,
-		lexer : Daisy.Lexer.VB,
-		theme : Daisy.Theme.Daisy
+		language : 'visualbasic',
+		theme : 'notepadplusplus'
 	});
 	var str=$('#test').val();
 	//var s2 ="123456789abcdefgh\n123456789abcdefghigklm\n";//"1234456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ";
@@ -14,8 +14,8 @@ $(function(){
 	//d_editor.appendText(s2);
 	//do_test();
 	//d_editor.appendText("abc\ndef\n/* 我爱\t小扬 */aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\nbedddc\ndedddddddddddddddf");
-	d_editor.appendText("'葛abc");
-	//d_editor.appendText("/* love 葛 daisy */\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n//hello world\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
+	d_editor.appendText("/** 我爱小扬~ */\n");
+	d_editor.appendText("\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n//hello world\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
 	//$.log(d_editor.doc.line_info);
 	//for(var i=0;i<10;i++)
 		//d_editor.appendString(str+str+str);

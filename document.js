@@ -17,6 +17,8 @@ Daisy._Document = function(editor) {
 	 * width: 该行的实际长度，使用context.measureText获得
 	 * 注意start不是起起字符的索引，是为了能够统一处理当文本全为空即没有一个字符的情况。
 	 * check_width:宽度修正。
+	 * 
+	 * 初始化时默认有一行宽度为0的行。
 	 */
 	this.line_info = [{
 		start : -1,
@@ -67,7 +69,12 @@ Daisy._Document.prototype = {
 	 * caret: 游标，通常由editor传入this.caret_position.
 	 */
 	insert : function(text, caret) {
-		
+		/*
+		 * 过滤掉\0x1f以下除去\0x10(即\n)之外的字符。
+		 * todo. 当前把\t(\0x09)也过滤了，在以后的版本中应该实现\t的处理。
+		 */
+		text = text.replace(/[\x00-\x09\x0b-\x1f]/g,"");
+				
 		var c_lines = [],del_num = 0,add_num = 0;
 		if(this.select_mode){
 			del_num = this._deleteSelect();
@@ -348,6 +355,12 @@ Daisy._Document.prototype = {
 	},
 	selectAll : function(){
 		return this.selectByIndex(-1,this.text_array.length-1);
+	},
+	getSelectText : function(){
+		if(!this.select_mode)
+			return "";
+		var f=this.select_range.from,t=this.select_range.to;
+		return this.text_array.slice(f.index+1,t.index+1).join("");
 	},
 	_findMaxWidthLine : function() {
 		var i = 0, m_l = this.line_info[i];

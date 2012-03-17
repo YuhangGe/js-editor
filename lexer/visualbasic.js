@@ -5,7 +5,7 @@ if( typeof Daisy.Lexer === 'undefined')
 (function(D, L) {
 	var DEFAULT = 154, COMMENT = 155, STRING_A = 156;
 
-	L.VB = function(editor) {
+	L.visualbasic = function(editor) {
 		this.editor = editor;
 		this.src = null;
 		this.theme = editor.theme;
@@ -28,7 +28,7 @@ if( typeof Daisy.Lexer === 'undefined')
 
 	}
 
-	L.VB.prototype = {
+	L.visualbasic.prototype = {
 
 		read_ch : function() {
 			if(this.idx >= this.end)

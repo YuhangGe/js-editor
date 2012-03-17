@@ -2,11 +2,9 @@ $(function(){
 	d_editor = new Daisy._Editor({
 		width: 700,
 		height: 500,
-		lexer : Daisy.Lexer.JS,
-		theme : Daisy.Theme.Daisy
+		language : 'javascript',
+		theme : 'aptana3'
 	});
-	d_editor._moveCaret_lc(0,-1);
-	d_editor.focus();
 	$.get("readme.txt",function(data){
 		 d_editor.appendText(data);
 	})
