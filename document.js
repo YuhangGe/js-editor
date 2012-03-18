@@ -1,12 +1,16 @@
 if( typeof Daisy === 'undefined')
 	Daisy = {};
 
-Daisy._Document = function(editor,name) {
+Daisy._Document = function(editor, params) {
 	this.editor = editor;
-	if(typeof name ==='string')
-		this.name = name;
+	if(params==null || typeof params.name !== 'string')
+		this.name = "__daisy_doc_" + (Daisy._Document.__name_id__++) + "__";
 	else
-		this.name = "__daisy_doc_"+(Daisy._Document.__name_id__++)+"__";
+		this.name = params.name;
+	if(params == null || typeof params.language !=='string')
+		this.language = 'general';
+	else
+		this.language = params.language;
 		
 	this.text_array = [];
 	this.style_array = [];
@@ -52,20 +56,21 @@ Daisy._Document = function(editor,name) {
 	 * 对当前caret的备份，只在切换document的时候使用。
 	 * 是editor.caret_position的拷贝。
 	 */
-	this.saved_caret = {
-		line : 0, //当前光标所在行，从0开始计数
-		colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
-		left : 0, //当前光标所在的相对canvas的left位置坐标
-		top : 0, //当前光标所在的相对canvas的top位置坐标
-		index : -1 //index:当前光标在哪个字符的后面，如果在文本的最开始，则为-1
+	this.saved_info = {
+		caret : {
+			line : 0, //当前光标所在行，从0开始计数
+			colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
+			left : 0, //当前光标所在的相对canvas的left位置坐标
+			top : 0, //当前光标所在的相对canvas的top位置坐标
+			index : -1 //index:当前光标在哪个字符的后面，如果在文本的最开始，则为-1
+		},
+		scroll : {
+			left : 0,
+			top : 0
+		},
+		language : this.language
 	}
-	/**
-	 * 对当前文档scrollLeft和scrollTop的备份，用来切换的时候保存。
-	 */
-	this.saved_scroll_offset = {
-		left: 0,
-		top : 0
-	}
+
 }
 Daisy._Document.CHAR_TYPE = {
 	SPACE : 0,

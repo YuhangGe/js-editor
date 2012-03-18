@@ -2,7 +2,6 @@ $(function(){
 	d_editor = new Daisy._Editor({
 		width: 400,
 		height: 300,
-		language : 'javascript',
 		theme : 'notepadplusplus'
 	});
 	
@@ -29,7 +28,9 @@ function deal_input(txt){
 }
 var cur_doc = 0, doc_len = 1;
 function c_doc(){
-	cur_doc = d_editor.createDocument();
+	cur_doc = d_editor.createDocument({
+		language : 'visualbasic'
+	});
 	d_editor.setActiveDocument(cur_doc);
 	d_editor.appendText("I Love Daisy!\n");
 	doc_len++;

@@ -183,7 +183,6 @@ if( typeof Daisy === 'undefined')
 		 * 设置当前语言。
 		 */
 		this.lang_name = _lang.toLowerCase();
-		this._setLanguage(this.lang_name);
 		/**
 		 * 初始化dom元素的事件处理
 		 */
@@ -192,7 +191,9 @@ if( typeof Daisy === 'undefined')
 		/**
 		 * 初始化时默认新建一个doument
 		 */
-		this.createDocument();
+		this.createDocument({
+			language : 'javascript'
+		});
 		this.setActiveDocument(0);
 
 		this.caret.focus();
@@ -249,6 +250,8 @@ if( typeof Daisy === 'undefined')
 
 		},
 		_setLanguage : function(language) {
+			if(this.lang_name === language)
+				return;
 			this.lang_name = language;
 			this.palette = this.theme.palettes[language];
 			/**
@@ -258,8 +261,8 @@ if( typeof Daisy === 'undefined')
 			this.render.resetTheme();
 			this.lexer.resetLexer();
 		},
-		createDocument : function() {
-			this.docs.push(new Daisy._Document(this));
+		createDocument : function(params) {
+			this.docs.push(new Daisy._Document(this,params));
 			return this.docs.length - 1;
 		},
 		setActiveDocument : function(index) {
@@ -270,20 +273,22 @@ if( typeof Daisy === 'undefined')
 				return;
 
 			if(this.cur_doc !== null){
-				this.cur_doc.saved_caret = this.caret_position;
-				this.cur_doc.saved_scroll_offset = {
+				this.cur_doc.saved_info.caret = this.caret_position;
+				this.cur_doc.saved_info.scroll = {
 					left : this.scroll_left,
 					top : this.scroll_top
 				}
+				this.cur_doc.saved_info.language = this.lang_name;
 			}
 			this.cur_doc = doc;
 			this.render.resetDoc();
-		 	this.caret_position = this.cur_doc.saved_caret;
+			this._setLanguage(this.cur_doc.saved_info.language);
+		 	this.caret_position = this.cur_doc.saved_info.caret;
 			/*
 			 * 恢复scrollLeft、scrollTop和caret.
 			 * 在_setScroll函数中会调用 _resetCaret设置caret的位置。
 			 */
-			this._setScroll(this.cur_doc.saved_scroll_offset.left,this.cur_doc.saved_scroll_offset.top);
+			this._setScroll(this.cur_doc.saved_info.scroll.left,this.cur_doc.saved_info.scroll.top);
 		
 			this.setFocus(true);
 			this.render.paint();
@@ -369,6 +374,7 @@ if( typeof Daisy === 'undefined')
 				return;
 			//$.log("move_lc:" +line+","+colum);
 			this._setCaret(this.cur_doc._getCaret_lc(line, colum));
+			
 		},
 		initEvent : function() {
 			var me = this;
@@ -758,7 +764,9 @@ if( typeof Daisy === 'undefined')
 					break;
 			}
 			this.cur_doc.select_mode = false;
-
+			if(this.caret_position.top){
+				
+			}
 			this.render.paint();
 		},
 		/**
