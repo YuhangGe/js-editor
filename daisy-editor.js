@@ -446,11 +446,11 @@ if( typeof Daisy === 'undefined')
 
 				/**
 				 * 如果当前游标的位置不在可见区域（即当前行的末尾没有显示），则滚动使之可见.
-				 * 当前使用的规则是滚动到当前行宽度减去15的位置。
+				 * 当前使用的规则是滚动到当前行宽度减去45的位置。
 				 */
 				var cur_line = me.cur_doc.line_info[pos.line];
 				if(cur_line.width < me.scroll_left)
-					me.scrollLeft(cur_line.width - 15);
+					me.scrollLeft(cur_line.width - 45);
 				/*
 				 * 如果当前游标接近边缘，则自动滚动使显示更多
 				 */
@@ -459,18 +459,21 @@ if( typeof Daisy === 'undefined')
 					/*
 					 * 接近左边缘，直接滚动。
 					 */
-					me._scrollLeft(dl);
+					//me._scrollLeft(dl);
+					me.adjustScroll();
 				} else if(dr >= -5 && cur_line.width > me.scroll_left + me.width) {
 					/*
 					 * 接近右边缘，还需要满足当前行未显示到末尾，才滚动
 					 */
-					me._scrollRight(dr);
+					//me._scrollRight(dr);
+					me.adjustScroll();
 				}
 				if(du <= 5) {
-					me._scrollUp(du);
-					//$.log("sup:"+du);
+					me.adjustScroll();
+					//me._scrollUp(du);
 				} else if(dd >= -5) {
-					me._scrollDown(dd);
+					me.adjustScroll();
+					//me._scrollDown(dd);
 					//$.log("sdown:"+dd);
 				}
 
@@ -669,6 +672,10 @@ if( typeof Daisy === 'undefined')
 			this.insertText(txt);
 			return true;
 		},
+		/**
+		 * 下面的四个函数不再使用。本来是用来当选择文本时光标移动到边缘时自动滚动，
+		 * 现在统一使用 this.adjustScroll()来调整滚动位置。
+		 *
 		_scrollUp : function(d) {
 			if(this.scroll_top > 0)
 				this.scrollTop(this.scroll_top - (this.SCROLL_STEP - d));
@@ -684,7 +691,7 @@ if( typeof Daisy === 'undefined')
 		_scrollLeft : function(d) {
 			if(this.scroll_left > 0)
 				this.scrollLeft(this.scroll_left - (this.SCROLL_STEP - d));
-		},
+		}, */
 		scrollLeft : function(value) {
 			if(!value instanceof Number || value < 0)
 				value = 0;
