@@ -19,88 +19,7 @@
  */
 if( typeof Daisy === 'undefined')
 	Daisy = {};
-(function(Daisy) {
-	var $ = function(id) {
-		return document.getElementById(id);
-	}
-	var ua = navigator.userAgent.toLowerCase();
-	var s;
-	( s = ua.match(/msie ([\d.]+)/)) ? $.ie = s[1] : ( s = ua.match(/firefox\/([\d.]+)/)) ? $.firefox = s[1] : ( s = ua.match(/chrome\/([\d.]+)/)) ? $.chrome = s[1] : ( s = ua.match(/opera.([\d.]+)/)) ? $.opera = s[1] : ( s = ua.match(/version\/([\d.]+).*safari/)) ? $.safari = s[1] : 0;
-
-	$.log = function(msg) {
-		if(console.log) {
-			console.log(msg);
-		}
-	}
-	$.addEvent = function(ele, event, handler) {
-		if( typeof ele === 'string')
-			ele = $(ele);
-		if(window.addEventListener) {
-			ele.addEventListener(event, handler);
-		} else {
-			ele.attachEvent('on' + event, handler);
-		}
-	}
-	$.delEvent = function(ele, event, handler) {
-		if( typeof ele === 'string')
-			ele = $(ele);
-		if(window.removeEventListener) {
-			ele.removeEventListener(event, handler);
-		} else {
-			ele.detachEvent('on' + event, handeler);
-		}
-	}
-	$.stopEvent = function(e) {
-		if(e.preventDefault) {
-			e.preventDefault();
-		} else {
-			e.returnValue = false;
-		}
-		if(e.stopPropagation) {
-			e.stopPropagation();
-		} else {
-			e.cancelBubble = true;
-		}
-	}
-	$.addWheelEvent = function(ele, handler) {
-		if( typeof ele === 'string')
-			ele = $(ele);
-		if(window.addEventListener) {
-			ele.addEventListener('mousewheel', handler);
-			ele.addEventListener('DOMMouseScroll', handler);
-		} else {
-			ele.attachEvent('onmousewheel', handler);
-		}
-	}
-	$.getFontHeight = function(font) {
-		var ele = document.createElement("span"), h = 0;
-		ele.style.font = font;
-		ele.style.margin = "0px";
-		ele.style.padding = "0px";
-		ele.style.visibility = "hidden";
-		ele.innerHTML = "Abraham 04-02.I Love Daisy.南京大学";
-		document.body.appendChild(ele);
-		h = ele.offsetHeight;
-		document.body.removeChild(ele);
-		return h;
-	}
-	/**
-	 * 格式区域，通常由高亮词法器返回
-	 * start:区域开始位置，指向区域的前一个字符（
-	 *   !!不包括该字符，因此如果区域从文本的第一个字符开始，则start为-1，这一点与其它地方统一。
-	 * length: 区域长度。
-	 * style: 区域渲染风格，是一个字典Object，包括color(颜色),background(背景色),
-	 *        bold(是否加粗)，ital(是否斜体),font(字体),size(字体大小)……等等。
-	 *        由于是字典Object，这写属性都是可选的，比如background没有设置(undefined)，
-	 * 		    表明不绘制背景。
-	 * tag: 该区域的其它属性。保留属性，用来考虑可能的扩展。
-	 */
-	Daisy.StyleRange = function(start, length, style, tag) {
-		this.start = start;
-		this.length = length;
-		this.style = typeof style === 'undefined' ? {} : style;
-		this.tag = tag;
-	}
+(function(Daisy,$) {
 
 	Daisy._Editor = function(config) {
 
@@ -308,6 +227,15 @@ if( typeof Daisy === 'undefined')
 				y : y + this.scroll_top - this.render.top_page_offset
 			};
 		},
+		_getEventPoint_chrome : function(e){
+			var x = e.x,y=e.y;
+			x-= this.container.offsetLeft-document.body.scrollLeft;
+			y-= this.container.offsetTop-document.body.scrollTop;
+			return {
+				x : x + this.scroll_left - this.render.left_page_offset,
+				y : y + this.scroll_top - this.render.top_page_offset
+			};
+		},
 		setFontName : function(name) {
 			this.font_name = name;
 			this.setFont(this.font_size + "px " + name);
@@ -376,278 +304,7 @@ if( typeof Daisy === 'undefined')
 			this._setCaret(this.cur_doc._getCaret_lc(line, colum));
 			
 		},
-		initEvent : function() {
-			var me = this;
-
-			this.__mouse_down__ = false;
-			this.__pre_pos__ = null;
-			$.addEvent(this.canvas, 'mousedown', function(e) {
-				//$.log("down");
-				me.cur_doc.select(null);
-				var p = me._getEventPoint(e);
-				me._moveCaret_xy(p.x, p.y);
-				me.__mouse_down__ = true;
-				me.__pre_pos__ = me.caret_position;
-				me.__down_pos__ = me.caret_position;
-
-				if(me.canvas.setCapture)
-					me.canvas.setCapture(true);
-
-				//$.log(me.caret_position);
-			});
-			$.addEvent(this.canvas, "dblclick", function(e) {
-				me.__mouse_down__ = false;
-				var p = me._getEventPoint(e);
-				me._setCaret(me.cur_doc.selectWord(p.x, p.y));
-				me.render.paint();
-				//e.preventDefault();
-			});
-			$.addEvent(this.caret, "dblclick", function(e) {
-				me.__mouse_down__ = false;
-				var p = me._getEventPoint(e);
-				//$.log(e)
-				me._setCaret(me.cur_doc.selectWord(this.offsetLeft + p.x, this.offsetTop + p.y));
-				me.render.paint();
-			});
-			$.addEvent(this.canvas, 'mouseup', function(e) {
-				//$.log('mup 1');
-				me.__mouse_down__ = false;
-
-				me.render.paint();
-
-				if(me.canvas.releaseCapture)
-					me.canvas.releaseCapture();
-
-			});
-
-			$.addEvent(this.canvas, 'mousemove', function(e) {
-				if(!me.__mouse_down__)
-					return;
-				var p = me._getEventPoint(e), pos = me.cur_doc._getCaret_xy(p.x, p.y);
-				out_if:
-				if(pos.line !== me.__pre_pos__.line || pos.colum !== me.__pre_pos__.colum) {
-					me._setCaret(pos);
-					me.setFocus(true);
-					var from = me.__down_pos__, to = pos;
-					if(from.line === to.line && from.colum === to.colum && me.select_mode === true) {
-						me.cur_doc.select(null);
-						break out_if;
-					} else if(from.line > to.line || (from.line === to.line && from.colum > to.colum)) {
-						from = pos;
-						to = me.__down_pos__;
-
-					}
-					//$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
-					me.cur_doc.select(from, to);
-
-					me.render.paint();
-					me.__pre_pos__ = pos;
-				}
-
-				/**
-				 * 如果当前游标的位置不在可见区域（即当前行的末尾没有显示），则滚动使之可见.
-				 * 当前使用的规则是滚动到当前行宽度减去45的位置。
-				 */
-				var cur_line = me.cur_doc.line_info[pos.line];
-				if(cur_line.width < me.scroll_left)
-					me.scrollLeft(cur_line.width - 45);
-				/*
-				 * 如果当前游标接近边缘，则自动滚动使显示更多
-				 */
-				// var dl = p.x - me.scroll_left, dr = dl - me.canvas_width, du = p.y - me.scroll_top, dd = du - me.canvas_height;
-				// if(dl <= 5) {
-					// /*
-					 // * 接近左边缘，直接滚动。
-					 // */
-					// //me._scrollLeft(dl);
-					// me.adjustScroll();
-				// } else if(dr >= -5 && cur_line.width > me.scroll_left + me.width) {
-					// /*
-					 // * 接近右边缘，还需要满足当前行未显示到末尾，才滚动
-					 // */
-					// //me._scrollRight(dr);
-					// me.adjustScroll();
-				// }
-				// if(du <= 5) {
-					// me.adjustScroll();
-					// //me._scrollUp(du);
-				// } else if(dd >= -5) {
-					// me.adjustScroll();
-					// //me._scrollDown(dd);
-					// //$.log("sdown:"+dd);
-				// }
- 				me.adjustScroll();
-				$.stopEvent(e);
-			});
-
-			$.addEvent(this.canvas, 'mouseup', function(e) {
-				//$.log('focus')
-				me.focused = true;
-				//me.caret.style.display = "block";
-				me.caret.focus();
-
-			});
-			$.addEvent(this.caret, 'blur', function(e) {
-				/**
-				 * hack. 下面条件满足则表明光标的焦点失去，并且不在canvas上，
-				 *       即整个editor失去焦点。
-				 */
-				//$.log('blur');
-				if(e.explicitOriginalTarget !== me.canvas) {
-					me.focused = false;
-					//me.caret.style.display = "none";
-				}
-			});
-			$.addEvent(this.caret, "keydown", function(e) {
-				//$.log(e.ctrlKey);
-				//$.log(e.keyCode);
-				switch(e.keyCode) {
-					case 13:
-						//回车
-						me.insertText("\n");
-						/**
-						 * 在ie下面要stopEvent，让keypress不要触发，否则回车会多一个\r。由于不影响其它浏览器，统一stopEvent.
-						 */
-						$.stopEvent(e);
-						break;
-					case 8:
-						//退格（删除）
-						me._delOrBack(false);
-						break;
-					case 9:
-						me.insertText("    ");
-						$.stopEvent(e);
-						break;
-					case 46:
-						//del键
-						me._delOrBack(true);
-						break;
-					case 37:
-						//向左按键
-						me.moveCaret("left");
-						break;
-					case 39:
-						//向右s
-						me.moveCaret("right");
-						break;
-					case 38:
-						//向上
-						me.moveCaret("up");
-						break;
-					case 40:
-						//向下
-						me.moveCaret("down");
-						break;
-					case 65:
-						if(e.ctrlKey) {
-							me._setCaret(me.cur_doc.selectAll());
-							me.render.paint();
-							$.stopEvent(e);
-						}
-						break;
-					case 67:
-						if(e.ctrlKey && ($.ie || $.firefox)) {
-
-							me.copy();
-							$.stopEvent(e);
-						}
-						break;
-					case 88:
-						if(e.ctrlKey && ($.ie || $.firefox)) {
-
-							me.cut();
-							$.stopEvent(e);
-						}
-						break;
-				}
-
-			});
-
-			$.addEvent(this.caret, 'input', function(e) {
-				//	$.log(e);
-				//var f_t = new Date().getTime();
-
-				if(this.value !== "") {
-					me.insertText(this.value);
-					this.value = "";
-				}
-
-				$.stopEvent(e);
-
-			});
-
-			$.addEvent(this.right_scroll, "scroll", function(e) {
-
-				//$.log(this.scrollTop);
-				if(this.scrollTop !== me.scroll_top) {
-					me._doScrollTop(this.scrollTop);
-				}
-			});
-			$.addEvent(this.right_scroll, "mousedown", function(e) {
-				me.canvas.focus();
-			});
-			$.addEvent(this.bottom_scroll, "mousedown", function(e) {
-				me.canvas.focus();
-			});
-			$.addEvent(this.bottom_scroll, "scroll", function(e) {
-
-				//$.log(this.scrollLeft);
-				//$.log("pp")
-				if(this.scrollLeft !== me.scroll_left) {
-					//$.log("dpp");
-					me._doScrollLeft(this.scrollLeft);
-					//me.scroll_left = this.scrollLeft
-					//me.render.scrollLeft(this.scrollLeft);
-					//me._resetCaret();
-				}
-			});
-			$.addEvent(this.caret, 'copy', function(e) {
-				me.copy(e);
-				$.stopEvent(e);
-			});
-			$.addEvent(this.caret, 'cut', function(e) {
-				me.cut(e);
-				$.stopEvent(e);
-			});
-
-			$.addEvent(this.caret, 'paste', function(e) {
-				/**
-				 * paste函数只在firefox下，并且内置的伪clipboard上没有内容的时候才会返回false，
-				 * 只有在这种情况下才不取消默认事件。因为firefox没办法直接操作系统clipboard上的数据，
-				 * 当copy时只能把数据copy到伪clipboard上（见clipboard.js代码），paste的时候也
-				 * 从伪clipboard上获取。但是，firefox用户可以也有从系统的clipboard得到数据的需要，
-				 * 为了平衡，就会在伪clipboard数据为空的时候返回false来使this.caret能够得到系统
-				 * clipboard上的数据从而触发input事件插入数据。注意一但firefox用户执行过copy操作，则
-				 * paste操作将不会得到系统clipboard上的数据。
-				 */
-				//$.log("paste");
-
-				if(me.paste(e)) {
-					$.stopEvent(e);
-				}
-
-			});
-
-			$.addWheelEvent(this.canvas, function(e) {
-				//e=window.event|e;
-
-				var delta = 0;
-				if(e.wheelDelta) {
-					delta = e.wheelDelta / 120;
-				} else if(e.detail) {
-					delta = -e.detail;
-				}
-				/*
-				 * 滚动到底或者顶时，不需要 event.preventDefault()。这样可以使用户可以继续在浏览器中滚动。
-				 */
-				if(delta > 0 && me.scroll_top === 0 || delta < 0 && me.scroll_top === me.render.max_scroll_top)
-					return;
-
-				me.scrollTop(me.scroll_top - delta * 10);
-				$.stopEvent(e);
-
-			});
-		},
+		
 		copy : function(e) {
 			if(this.cur_doc.select_mode)
 				this.clipboard.setText(e, this.cur_doc.getSelectText());
@@ -720,6 +377,7 @@ if( typeof Daisy === 'undefined')
 			this._doScrollTop(value);
 		},
 		_doScrollTop : function(value) {
+			//$.log(value);
 			this.scroll_top = value;
 			this.render.scrollTop(this.scroll_top);
 			this._resetCaret();
@@ -863,4 +521,4 @@ if( typeof Daisy === 'undefined')
 	Daisy.insertEditor = function(parent_element, config) {
 
 	}
-})(Daisy);
+})(Daisy,Daisy.$);
