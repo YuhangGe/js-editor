@@ -98,9 +98,9 @@ Daisy._Document.prototype = {
 	insert : function(text, caret) {
 		/*
 		 * 过滤掉\0x1f以下除去\0x10(即\n)之外的字符。
-		 * todo. 当前把\t(\0x09)也过滤了，在以后的版本中应该实现\t的处理。
+		 * todo. 当前把\t(\0x09)直接替换成了4 个空格，在以后的版本中应该实现\t的处理。
 		 */
-		text = text.replace(/[\x00-\x09\x0b-\x1f]/g, "");
+		text = text.replace(/[\x00-\x08\x0b-\x1f]/g, "").replace(/\t/g,"    ");
 
 		var c_lines = [], del_num = 0, add_num = 0;
 		if(this.select_mode) {
@@ -161,6 +161,8 @@ Daisy._Document.prototype = {
 		}
 	},
 	append : function(str) {
+		str = str.replace(/[\x00-\x08\x0b-\x1f]/g, "").replace(/\t/g,"    ");
+		
 		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
 
 		for(var i = 0; i < str.length; i++) {
@@ -197,7 +199,8 @@ Daisy._Document.prototype = {
 	},
 	_deleteChar : function(line, colum) {
 
-		var c_line = this.line_info[line], index = c_line.start + colum + 1;
+		var c_line = this.line_info[line], index = c_line.start + colum + 1,_max=false;
+		 
 		//$.dprint("del: %d,%d,%d",line,colum,index)
 
 		for(var i = line + 1; i < this.line_number; i++) {
@@ -209,17 +212,16 @@ Daisy._Document.prototype = {
 			r_line--;
 			r_colum = p_line.length - 1;
 			p_line.check_width = true;
-			;
 			p_line.length += c_line.length;
 			this.line_info.splice(line, 1);
 			this.line_number--;
 		} else {
 			c_line.length--;
 			c_line.check_width = true;
-			;
 		}
 		if(colum < 0)
 			this.editor.render.resetRenderHeight();
+
 		this.editor.render.resetRegion();
 
 		this.text_array.splice(index, 1);
@@ -243,6 +245,7 @@ Daisy._Document.prototype = {
 		for(var i = t.line + 1; i < this.line_number; i++) {
 			this.line_info[i].start -= len;
 		}
+		this.line_info[f_l].width = 0;
 		this.line_info[f_l].check_width = true;
 		for(var i = f_l; i <= t_l; i++) {
 			if(this.line_info[i] === this.max_width_line) {

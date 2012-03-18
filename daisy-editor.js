@@ -360,8 +360,8 @@ if( typeof Daisy === 'undefined')
 		 *  否则移动到该字符之后.
 		 */
 		_moveCaret_xy : function(x, y) {
-			if(x < 0 || y < 0)
-				return;
+			//if(x < 0 || y < 0)
+				//return;
 			this._setCaret(this.cur_doc._getCaret_xy(x, y));
 		},
 		/**
@@ -370,9 +370,9 @@ if( typeof Daisy === 'undefined')
 		 * 如果没有传入colum参数，则移动到line行的末尾.
 		 */
 		_moveCaret_lc : function(line, colum) {
-			if(line < 0 || line > this.line_number - 1)
-				return;
 			//$.log("move_lc:" +line+","+colum);
+			//if(line < 0 || line > this.line_number - 1)
+				//return;
 			this._setCaret(this.cur_doc._getCaret_lc(line, colum));
 			
 		},
@@ -509,9 +509,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 8:
 						//退格（删除）
-						var new_pos = me.cur_doc.backspace(me.caret_position);
-						me._moveCaret_lc(new_pos.line, new_pos.colum);
-						me.render.paint();
+						me._delOrBack(false);
 						break;
 					case 9:
 						me.insertText("    ");
@@ -519,9 +517,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 46:
 						//del键
-						var new_pos = me.cur_doc.del(me.caret_position);
-						me._moveCaret_lc(new_pos.line, new_pos.colum);
-						me.render.paint();
+						me._delOrBack(true);
 						break;
 					case 37:
 						//向左按键
@@ -761,40 +757,71 @@ if( typeof Daisy === 'undefined')
 					break;
 				case "down":
 					this.downCaret(c);
+						
+					
 					break;
 			}
 			this.cur_doc.select_mode = false;
-			if(this.caret_position.top){
-				
-			}
+			
+			this.adjustScroll();
+			
 			this.render.paint();
+		},
+		/**
+		 * 跟据光标位置对滚动进行调整。比如当用户通过键盘把光标向下移动到不可见区域时，需要调整scrollTop使其可见。
+		 */
+		adjustScroll : function(){
+			//$.log('adjust');
+			var t0 = this.scroll_top - this.caret_position.top,t1 = 0;
+			//var t1 =  this.caret_position.top + this.theme.font_height - this.scroll_top - this.render.height;
+
+			if(t0>0){
+				 // 光标在上方不可见处
+				this._doScrollTop(this.scroll_top - t0)
+			}else if((t1=this.theme.font_height - this.render.height - t0) > 0) {
+				//光标在下方不可见处
+				this._doScrollTop(this.scroll_top + t1);
+			}
+			
+			var t2 = this.scroll_left - this.caret_position.left,t3=0;
+			if(t2>0){
+				this.scrollLeft(this.scroll_left-t2-100);
+			}else if((t3=-this.render.width-t2)>0){
+				this.scrollLeft(this.scroll_left+t3+100);
+			}
+
 		},
 		/**
 		 * 向左移动光标
 		 */
 		leftCaret : function(c) {
 			if(c.colum === -1) {
-				this._moveCaret_lc(c.line - 1)
+				if(c.line>0)
+					this._moveCaret_lc(c.line - 1)
 			} else {
 				this._moveCaret_lc(c.line, c.colum - 1);
 			}
 		},
 		rightCaret : function(c) {
 			if(c.colum === this.cur_doc.line_info[c.line].length - 1) {
-				this._moveCaret_lc(c.line + 1, -1);
+				if(c.line<this.cur_doc.line_number-1)
+					this._moveCaret_lc(c.line + 1, -1);
 			} else {
 				this._moveCaret_lc(c.line, c.colum + 1)
 			}
 		},
 		downCaret : function(c) {
-			this._moveCaret_xy(c.left, c.top + this.render.line_height);
+			if(c.line<this.cur_doc.line_number-1)
+				this._moveCaret_xy(c.left, c.top + this.render.line_height);
 		},
 		upCaret : function(c) {
-			this._moveCaret_xy(c.left, c.top - this.render.line_height);
+			if(c.line>0)
+				this._moveCaret_xy(c.left, c.top - this.render.line_height);
 		},
 		insertText : function(text) {
 			var new_pos = this.cur_doc.insert(text, this.caret_position);
 			this._moveCaret_lc(new_pos.line, new_pos.colum);
+			this.adjustScroll();
 			this.render.paint();
 
 			//$.log("insert:"+text);
@@ -802,6 +829,20 @@ if( typeof Daisy === 'undefined')
 		},
 		appendText : function(text) {
 			this.cur_doc.append(text);
+			this.render.paint();
+		},
+		/**
+		 * 处理键盘的delete和backspace。如果参数del为true则处理delete键，否则处理backspace键。
+		 */
+		_delOrBack : function(del){
+			var new_pos = null;
+			if(del){
+				new_pos = this.cur_doc.del(this.caret_position);
+			}else{
+				new_pos = this.cur_doc.backspace(this.caret_position);	
+			}
+			this._moveCaret_lc(new_pos.line, new_pos.colum);
+			this.adjustScroll();
 			this.render.paint();
 		},
 		focus : function() {

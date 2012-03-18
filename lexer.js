@@ -43,11 +43,11 @@ Daisy._LexerManager = function(editor){
 }
 Daisy._LexerManager.prototype = {
 	resetLexer : function(){
-		$.dprint("r lexs")
+		//$.dprint("r lexs")
 		var name = this.editor.lang_name;
 		if(this.lexer_hash[name]==null){
 			this.lexer_hash[name]=new Daisy.Lexer[name](this.editor);
-			$.dprint("new lexer : %s",name);
+			//$.dprint("new lexer : %s",name);
 		}
 		this.lexer = this.lexer_hash[name];
 	},

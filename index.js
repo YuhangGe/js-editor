@@ -13,7 +13,7 @@ $(function(){
 	
 	//d_editor.appendText(s2);
 	//do_test();
-	//d_editor.appendText("abc\ndef\n/* 我爱\t小扬 */aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\nbedddc\ndedddddddddddddddf");
+	//d_editor.appendText("\n// 我爱\t小扬 a\t\taaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n\n\n\n123\n");
 	d_editor.appendText("/** 我爱小扬~ */\n");
 	d_editor.appendText("\n\n\n\n\n/abcdrrrgdsdsdsdsdddsrrrrrrrrrrrrrrrefgh/\n\\abcdefgh\\\n\n\n//hello world\n\n\nfunction(a)\n{\nalert(\"hello\");\nvar t = new Array(10,1.23),q=/djsjooiiiiksldl/, k = new Int32Array(100), o = [\"jdlsjdlsdjl\",'I love Dasiy.', 'hello, nanjing university'];// test test\n/*\n test\ntest\n */}\n\n\n\n\n\n\n var a=1234");
 	//$.log(d_editor.doc.line_info);

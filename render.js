@@ -219,18 +219,18 @@ if( typeof Daisy === 'undefined')
 			for(var i = this.region.start_line; i < this.region.end_line + 1; i++) {
 				var line = this.doc.line_info[i];
 				if(line.check_width) {
-					//$.log('check');
-					var lw = this.getTextWidth_2(this.doc.text_array.slice(line.start + 1, line.start + 1 + line.length).join(""), line.start + 1);
-					if(line.width !== lw) {
-						line.width = lw;
-						if(lw > max_line.width || line === max_line)
-							max_change = true;
-					}
+					var lw = this.getTextWidth_2(this.doc.text_array.slice(line.start + 1, line.start + 1 + line.length).join(""), line.start + 1);				
+					if((line.width=lw) > max_line.width || line===max_line)
+						max_change = true;
+	
 					line.check_width = false;
+			 
 				}
 			}
 			if(max_change) {
+				//$.log("mx")
 				this.doc._findMaxWidthLine();
+				//$.log(this.doc.max_width_line.width);
 				this.resetRenderWidth();
 			}
 			
