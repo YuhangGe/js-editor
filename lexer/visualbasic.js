@@ -173,7 +173,7 @@ if( typeof Daisy.Lexer === 'undefined')
 						this.yystyle = this.yydefault;
 						break;
 				}
-				this.editor.doc.setRangeStyle(pre_idx, yylen, this.yystyle);
+				this.editor.cur_doc.setRangeStyle(pre_idx, yylen, this.yystyle);
 			}
 
 		},
@@ -181,7 +181,7 @@ if( typeof Daisy.Lexer === 'undefined')
 			this.i_s = state;
 		},
 		lex : function() {
-			this.src = this.editor.doc.text_array;
+			this.src = this.editor.cur_doc.text_array;
 			this.end = this.src.length;
 			this.i_s = 154;
 			this.do_lex();

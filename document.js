@@ -1,8 +1,13 @@
 if( typeof Daisy === 'undefined')
 	Daisy = {};
 
-Daisy._Document = function(editor) {
+Daisy._Document = function(editor,name) {
 	this.editor = editor;
+	if(typeof name ==='string')
+		this.name = name;
+	else
+		this.name = "__daisy_doc_"+(Daisy._Document.__name_id__++)+"__";
+		
 	this.text_array = [];
 	this.style_array = [];
 
@@ -17,7 +22,7 @@ Daisy._Document = function(editor) {
 	 * width: 该行的实际长度，使用context.measureText获得
 	 * 注意start不是起起字符的索引，是为了能够统一处理当文本全为空即没有一个字符的情况。
 	 * check_width:宽度修正。
-	 * 
+	 *
 	 * 初始化时默认有一行宽度为0的行。
 	 */
 	this.line_info = [{
@@ -43,16 +48,33 @@ Daisy._Document = function(editor) {
 		to : null
 	};
 	this.select_mode = false;
-	this.CHAR_TYPE = {
-		SPACE : 0,
-		WORD : 1,
-		INVISIBLE : 3,
-		ASCII : 4,
-		UNICODE : 5
-	};
-
+	/**
+	 * 对当前caret的备份，只在切换document的时候使用。
+	 * 是editor.caret_position的拷贝。
+	 */
+	this.saved_caret = {
+		line : 0, //当前光标所在行，从0开始计数
+		colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
+		left : 0, //当前光标所在的相对canvas的left位置坐标
+		top : 0, //当前光标所在的相对canvas的top位置坐标
+		index : -1 //index:当前光标在哪个字符的后面，如果在文本的最开始，则为-1
+	}
+	/**
+	 * 对当前文档scrollLeft和scrollTop的备份，用来切换的时候保存。
+	 */
+	this.saved_scroll_offset = {
+		left: 0,
+		top : 0
+	}
 }
-
+Daisy._Document.CHAR_TYPE = {
+	SPACE : 0,
+	WORD : 1,
+	INVISIBLE : 3,
+	ASCII : 4,
+	UNICODE : 5
+};
+Daisy._Document.__name_id__ = 0;
 Daisy._Document.prototype = {
 	setRangeStyle : function(start, length, style_name) {
 		var c = this.editor.palette.keys[style_name];
@@ -73,77 +95,77 @@ Daisy._Document.prototype = {
 		 * 过滤掉\0x1f以下除去\0x10(即\n)之外的字符。
 		 * todo. 当前把\t(\0x09)也过滤了，在以后的版本中应该实现\t的处理。
 		 */
-		text = text.replace(/[\x00-\x09\x0b-\x1f]/g,"");
-				
-		var c_lines = [],del_num = 0,add_num = 0;
-		if(this.select_mode){
+		text = text.replace(/[\x00-\x09\x0b-\x1f]/g, "");
+
+		var c_lines = [], del_num = 0, add_num = 0;
+		if(this.select_mode) {
 			del_num = this._deleteSelect();
 			caret = this.select_range.from;
 		}
 		c_lines.push(caret.line);
 		//$.log(this.line_info);
-		for(var i=0;i<text.length;i++){
-			this.text_array.splice(caret.index+1+i,0,text[i]);
-			this.style_array.splice(caret.index+1+i,0,0);
-		}		
-		var r_line,r_colum;
-		var f_l = caret.line,s_lines = text.split("\n"),line=this.line_info[f_l];
-		for(var i = f_l + 1; i < this.line_number; i++) {
-			this.line_info[i].start+=text.length;
+		for(var i = 0; i < text.length; i++) {
+			this.text_array.splice(caret.index + 1 + i, 0, text[i]);
+			this.style_array.splice(caret.index + 1 + i, 0, 0);
 		}
-		if(s_lines.length===1){
+		var r_line, r_colum;
+		var f_l = caret.line, s_lines = text.split("\n"), line = this.line_info[f_l];
+		for(var i = f_l + 1; i < this.line_number; i++) {
+			this.line_info[i].start += text.length;
+		}
+		if(s_lines.length === 1) {
 			line.length += s_lines[0].length;
 			line.check_width = true;
 			r_line = f_l;
-			r_colum = caret.colum+s_lines[0].length;
-		}else{
+			r_colum = caret.colum + s_lines[0].length;
+		} else {
 			var r_len = line.length - caret.colum - 1;
-			line.length = caret.colum+1+s_lines[0].length;
+			line.length = caret.colum + 1 + s_lines[0].length;
 			line.check_width = true;
-			for(var i=1;i<s_lines.length;i++){
+			for(var i = 1; i < s_lines.length; i++) {
 				//$.log(s_lines[i]);
 				line = {
-					start : line.start+line.length+1,
+					start : line.start + line.length + 1,
 					length : s_lines[i].length,
 					width : 0,
 					check_width : true
 				}
-				if(i===s_lines.length-1){
+				if(i === s_lines.length - 1) {
 					line.length += r_len;
 				}
-				this.line_info.splice(f_l+i,0,line);
-				c_lines.push(f_l+i);
+				this.line_info.splice(f_l + i, 0, line);
+				c_lines.push(f_l + i);
 			}
-			this.line_number+=s_lines.length-1;
+			this.line_number += s_lines.length - 1;
 			add_num = s_lines.length - 1;
 			r_line = f_l + add_num;
-			r_colum = s_lines[s_lines.length-1].length-1;
+			r_colum = s_lines[s_lines.length - 1].length - 1;
 		}
-		
-		if(add_num!==del_num)
+
+		if(add_num !== del_num)
 			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
-		
+
 		//$.log(c_lines);
 		this._doLex(c_lines);
-		
+
 		//$.log(this.line_info);
 		return {
-			line:r_line,
-			colum:r_colum
+			line : r_line,
+			colum : r_colum
 		}
 	},
 	append : function(str) {
 		var last_line = this.line_info[this.line_number - 1], lines = str.split("\n"), l = lines[0], size_change = lines.length > 1, pre_max_width = this.max_width_line.width, start_idx = this.text_array.length;
-		
+
 		for(var i = 0; i < str.length; i++) {
 			this.text_array.push(str[i]);
 			this.style_array.push(0);
 		}
-		
+
 		last_line.length += l.length;
 		last_line.check_width = true;
-		var ch_l = [this.line_number-1];
+		var ch_l = [this.line_number - 1];
 		start_idx += l.length;
 		for(var i = 1; i < lines.length; i++) {
 			// \n after each line except last line.
@@ -162,13 +184,12 @@ Daisy._Document.prototype = {
 			this.line_number++;
 
 		}
-		
+
 		this._doLex(ch_l);
-		if(lines.length>1)
+		if(lines.length > 1)
 			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
 	},
-	
 	_deleteChar : function(line, colum) {
 
 		var c_line = this.line_info[line], index = c_line.start + colum + 1;
@@ -182,18 +203,20 @@ Daisy._Document.prototype = {
 			var p_line = this.line_info[line - 1], cw = p_line.width + c_line.width;
 			r_line--;
 			r_colum = p_line.length - 1;
-			p_line.check_width = true;;
+			p_line.check_width = true;
+			;
 			p_line.length += c_line.length;
 			this.line_info.splice(line, 1);
 			this.line_number--;
 		} else {
 			c_line.length--;
-			c_line.check_width = true;;
+			c_line.check_width = true;
+			;
 		}
-		if(colum<0)
+		if(colum < 0)
 			this.editor.render.resetRenderHeight();
 		this.editor.render.resetRegion();
-		
+
 		this.text_array.splice(index, 1);
 		this.style_array.splice(index, 1);
 		this._doLex([r_line]);
@@ -206,43 +229,42 @@ Daisy._Document.prototype = {
 	 * 删除选中区域的文本，返回完全删除的行数（而不是受影响的行数，即如果选中的区域在一行中，则返回值为0）。
 	 */
 	_deleteSelect : function() {
-		
+
 		var f = this.select_range.from, t = this.select_range.to;
 		var f_l = f.line, t_l = t.line, f_colum = f.colum, t_colum = t.colum;
 		var len = t.index - f.index;
-		this.text_array.splice(f.index+1,len);
-		this.style_array.splice(f.index+1,len);
+		this.text_array.splice(f.index + 1, len);
+		this.style_array.splice(f.index + 1, len);
 		for(var i = t.line + 1; i < this.line_number; i++) {
 			this.line_info[i].start -= len;
 		}
 		this.line_info[f_l].check_width = true;
-		for(var i=f_l;i<=t_l;i++){
-			if(this.line_info[i]===this.max_width_line)
-			{
+		for(var i = f_l; i <= t_l; i++) {
+			if(this.line_info[i] === this.max_width_line) {
 				/**
 				 * 如果选中的行中有最宽行，则把最宽行设置为选中的第一行
 				 * 这样在Render的_check_width函数中就一定会执行到_findMaxWidthLine从而重新真正查找最宽行。
 				 */
-				this.max_width_line=this.line_info[f_l];
+				this.max_width_line = this.line_info[f_l];
 				break;
 			}
 		}
-		if(f_l===t_l){
+		if(f_l === t_l) {
 			this.line_info[f_l].length -= len;
-		}else{
-			this.line_info[f_l].length = f_colum + this.line_info[t_l].length- t_colum; 
-			this.line_info.splice(f_l+1,t_l-f_l);
-			this.line_number-=t_l-f_l;
-			
+		} else {
+			this.line_info[f_l].length = f_colum + this.line_info[t_l].length - t_colum;
+			this.line_info.splice(f_l + 1, t_l - f_l);
+			this.line_number -= t_l - f_l;
+
 		}
-	
+
 		this.select_mode = false;
-		
+
 		return t_l - f_l;
 	},
 	del : function(caret) {
 		if(this.select_mode) {
-			if(this._deleteSelect()>0)
+			if(this._deleteSelect() > 0)
 				this.editor.render.resetRenderHeight();
 			this.editor.render.resetRegion();
 			this._doLex([this.select_range.from.line]);
@@ -267,7 +289,7 @@ Daisy._Document.prototype = {
 	},
 	backspace : function(caret) {
 		if(this.select_mode) {
-			if(this._deleteSelect()>0)
+			if(this._deleteSelect() > 0)
 				this.editor.render.resetRenderHeight();
 			this.editor.render.resetRegion();
 			this._doLex([this.select_range.from.line]);
@@ -353,14 +375,14 @@ Daisy._Document.prototype = {
 		this.select_range.to = to;
 		this.select_mode = true;
 	},
-	selectAll : function(){
-		return this.selectByIndex(-1,this.text_array.length-1);
+	selectAll : function() {
+		return this.selectByIndex(-1, this.text_array.length - 1);
 	},
-	getSelectText : function(){
+	getSelectText : function() {
 		if(!this.select_mode)
 			return "";
-		var f=this.select_range.from,t=this.select_range.to;
-		return this.text_array.slice(f.index+1,t.index+1).join("");
+		var f = this.select_range.from, t = this.select_range.to;
+		return this.text_array.slice(f.index + 1, t.index + 1).join("");
 	},
 	_findMaxWidthLine : function() {
 		var i = 0, m_l = this.line_info[i];
@@ -375,93 +397,90 @@ Daisy._Document.prototype = {
 		this.editor.lexer.lex(lines);
 	},
 	/**
-		 * 选中当前光标所在的单词
-		 */
-		selectWord : function(x, y) {
-			var c = this.editor.caret_position, line = this.line_info[c.line];
-			if(line.length === 0)
-				return;
+	 * 选中当前光标所在的单词
+	 */
+	selectWord : function(x, y) {
+		var c = this.editor.caret_position, line = this.line_info[c.line];
+		if(line.length === 0)
+			return;
 
-			var i = this._getCharIndex(x, y), chr = this.text_array[i];
-			if(chr === '\n') {
-				i--;
-				chr = this.text_array[i];
-			}
-			var chr_type = this._getCharType(chr);
-
-			var l = i - 1, r = i + 1, e = this.text_array.length - 1;
-			while(l >= 0 && this._getCharType(this.text_array[l]) === chr_type)
-			l--;
-			while(r <= e && this._getCharType(this.text_array[r]) === chr_type)
-			r++;
-
-			//$.log("check word:"+i+","+l+","+(r-1));
-			return this.selectByIndex(l, r - 1);
-		},
-		/**
-		 * 选定从from所在字符后的一个字符到to所在的字符，注意没有包括from所在字符，
-		 * from如果为-1代表从第一个字符开始选取。
-		 */
-		selectByIndex : function(from, to) {
-			var fc = this.getCaretByIndex(from), tc = this.getCaretByIndex(to);
-			//this._setCaret(tc);
-			this.select_mode = true;
-			this.select_range.from = fc;
-			this.select_range.to = tc;
-			//this.render.paint();
-			return fc;
-		},
-		/**
-		 * 得到index所指字符的右边位置的游标caret位置。
-		 * 如果index为 -1，则返回第一个字符的左边位置，即文本最前端位置
-		 * 如果index超过text_array的大小，则返回文本最末端位置
-		 */
-		getCaretByIndex : function(index) {
-			if(index === -1)
-				return {
-					line : 0,
-					colum : -1,
-					index : -1,
-					left : 0,
-					top : 0
-				};
-			for(var i = 0; i < this.line_number; i++) {
-				var line = this.line_info[i];
-				if(line.start + line.length >= index) {
-					return this._getCaret_lc(i, index - line.start - 1);
-				}
-			}
-		},
-		/**
-		 * 得到坐标x,y处的字符索引.算法和_getCaret_xy类似，但不一样的在于，
-		 * _getCaret_xy是返回x,y处字符对应的游标(caret)位置。
-		 */
-		_getCharIndex : function(x, y) {
-			var row = Math.floor(y / this.editor.render.line_height),
-			 row = row > this.line_number - 1 ? this.line_number - 1 : row,
-			  line = this.line_info[row], left = 0,
-			   idx = line.start;
-
-			if(line.length > 0) {
-				idx = line.start + 1;
-				var e = idx + line.length;
-				for(; idx < e; idx++) {
-					left += this.editor.render.getTextWidth_2(this.text_array[idx],idx);
-					if(left >= x)
-						break;
-				}
-			}
-
-			return idx;
-		},
-		_getCharType : function(c) {
-			if(/[0-9a-zA-Z_]/.test(c))
-				return this.CHAR_TYPE.WORD;
-			else if(c === ' ' || c === '\t')
-				return this.CHAR_TYPE.SPACE;
-			else if(c < '\xff')
-				return this.CHAR_TYPE.ASCII;
-			else
-				return this.CHAR_TYPE.UNICODE;
+		var i = this._getCharIndex(x, y), chr = this.text_array[i];
+		if(chr === '\n') {
+			i--;
+			chr = this.text_array[i];
 		}
+		var chr_type = this._getCharType(chr);
+
+		var l = i - 1, r = i + 1, e = this.text_array.length - 1;
+		while(l >= 0 && this._getCharType(this.text_array[l]) === chr_type)
+		l--;
+		while(r <= e && this._getCharType(this.text_array[r]) === chr_type)
+		r++;
+
+		//$.log("check word:"+i+","+l+","+(r-1));
+		return this.selectByIndex(l, r - 1);
+	},
+	/**
+	 * 选定从from所在字符后的一个字符到to所在的字符，注意没有包括from所在字符，
+	 * from如果为-1代表从第一个字符开始选取。
+	 */
+	selectByIndex : function(from, to) {
+		var fc = this.getCaretByIndex(from), tc = this.getCaretByIndex(to);
+		//this._setCaret(tc);
+		this.select_mode = true;
+		this.select_range.from = fc;
+		this.select_range.to = tc;
+		//this.render.paint();
+		return fc;
+	},
+	/**
+	 * 得到index所指字符的右边位置的游标caret位置。
+	 * 如果index为 -1，则返回第一个字符的左边位置，即文本最前端位置
+	 * 如果index超过text_array的大小，则返回文本最末端位置
+	 */
+	getCaretByIndex : function(index) {
+		if(index === -1)
+			return {
+				line : 0,
+				colum : -1,
+				index : -1,
+				left : 0,
+				top : 0
+			};
+		for(var i = 0; i < this.line_number; i++) {
+			var line = this.line_info[i];
+			if(line.start + line.length >= index) {
+				return this._getCaret_lc(i, index - line.start - 1);
+			}
+		}
+	},
+	/**
+	 * 得到坐标x,y处的字符索引.算法和_getCaret_xy类似，但不一样的在于，
+	 * _getCaret_xy是返回x,y处字符对应的游标(caret)位置。
+	 */
+	_getCharIndex : function(x, y) {
+		var row = Math.floor(y / this.editor.render.line_height), row = row > this.line_number - 1 ? this.line_number - 1 : row, line = this.line_info[row], left = 0, idx = line.start;
+
+		if(line.length > 0) {
+			idx = line.start + 1;
+			var e = idx + line.length;
+			for(; idx < e; idx++) {
+				left += this.editor.render.getTextWidth_2(this.text_array[idx], idx);
+				if(left >= x)
+					break;
+			}
+		}
+
+		return idx;
+	},
+	_getCharType : function(c) {
+		if(/[0-9a-zA-Z_]/.test(c))
+			return Daisy._Document.CHAR_TYPE.WORD;
+		else if(c === ' ' || c === '\t')
+			return Daisy._Document.CHAR_TYPE.SPACE;
+		else if(c < '\xff')
+			return Daisy._Document.CHAR_TYPE.ASCII;
+		else
+			return Daisy._Document.CHAR_TYPE.UNICODE;
+	}
 }

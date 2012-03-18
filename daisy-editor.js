@@ -24,7 +24,8 @@ if( typeof Daisy === 'undefined')
 		return document.getElementById(id);
 	}
 	var ua = navigator.userAgent.toLowerCase();
-	var s; ( s = ua.match(/msie ([\d.]+)/)) ? $.ie = s[1] : ( s = ua.match(/firefox\/([\d.]+)/)) ? $.firefox = s[1] : ( s = ua.match(/chrome\/([\d.]+)/)) ? $.chrome = s[1] : ( s = ua.match(/opera.([\d.]+)/)) ? $.opera = s[1] : ( s = ua.match(/version\/([\d.]+).*safari/)) ? $.safari = s[1] : 0;
+	var s;
+	( s = ua.match(/msie ([\d.]+)/)) ? $.ie = s[1] : ( s = ua.match(/firefox\/([\d.]+)/)) ? $.firefox = s[1] : ( s = ua.match(/chrome\/([\d.]+)/)) ? $.chrome = s[1] : ( s = ua.match(/opera.([\d.]+)/)) ? $.opera = s[1] : ( s = ua.match(/version\/([\d.]+).*safari/)) ? $.safari = s[1] : 0;
 
 	$.log = function(msg) {
 		if(console.log) {
@@ -71,6 +72,18 @@ if( typeof Daisy === 'undefined')
 			ele.attachEvent('onmousewheel', handler);
 		}
 	}
+	$.getFontHeight = function(font) {
+		var ele = document.createElement("span"), h = 0;
+		ele.style.font = font;
+		ele.style.margin = "0px";
+		ele.style.padding = "0px";
+		ele.style.visibility = "hidden";
+		ele.innerHTML = "Abraham 04-02.I Love Daisy.南京大学";
+		document.body.appendChild(ele);
+		h = ele.offsetHeight;
+		document.body.removeChild(ele);
+		return h;
+	}
 	/**
 	 * 格式区域，通常由高亮词法器返回
 	 * start:区域开始位置，指向区域的前一个字符（
@@ -105,18 +118,24 @@ if( typeof Daisy === 'undefined')
 		this.read_only = false;
 
 		/*
-		 * 光标Caret位置的数据结构。
-		 */
-		this.caret_position = {
-			line : 0, //当前光标所在行，从0开始计数
-			colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
-			left : 0, //当前光标所在的相对canvas的left位置坐标
-			top : 0, //当前光标所在的相对canvas的top位置坐标
-			index : -1 //index:当前光标在哪个字符的后面，如果在文本的最开始，则为-1
-		};
+		 *  光标Caret位置的数据结构。
+		 *  line : 0, //当前光标所在行，从0开始计数
+		 *	colum : -1, //当前光标在哪一列的后面，如果光标在该行的最左端，则为-1
+		 *	left : 0, //当前光标所在的相对canvas的left位置坐标
+		 *	top : 0, //当前光标所在的相对canvas的top位置坐标
+		 *	index : -1 //index:当前光标在哪个字符的后面，如果在文本的最开始，则为-1
+		 *	这里不需要实例，实例都保存在document的saved_caret中，当切换到不同的document时，
+		 *  this.caret_position指向不同document的saved_caret
+		 * */
+		this.caret_position = null;
+
 		this.focused = false;
 		this.scroll_top = 0;
 		this.scroll_left = 0;
+		/*
+		 * 得到剪贴板
+		 */
+		this.clipboard = Daisy.Clipboard.getInstance();
 		/*
 		 * 初始化dom元素
 		 */
@@ -137,30 +156,29 @@ if( typeof Daisy === 'undefined')
 		this.theme = null;
 		this.palette = null;
 		this._loadTheme(this.theme_name);
-
+		 
 		/**
-		 * 新建doc\lexer\render实例。这是支撑editor的三大核心元素。
+		 * 新建document\lexermanager\render实例。这是支撑editor的三大核心元素。
 		 */
-		this.doc = new Daisy._Document(this);
+		this.docs = [];
+		this.cur_doc = null;
 		this.lexer = new Daisy._LexerManager(this);
 		this.render = new Daisy._Render(this);
 		/**
-		 * 根据配置设置dom元素相关大小
+		 * 根据配置设置dom元素相关大小。这些大小需要依赖render计算出来的相关大小，
+		 * 所以要放在render的初始化之后调用。
 		 */
-		this._setSize();
+		this._setDomSize();
 		/**
 		 * 根据主题设置dom元素属性
 		 */
-		this.caret.style.height = this.render.line_height + "px";
+		this.caret.style.height = this.theme.font_height + "px";
 		this.caret.style.font = this.theme.font;
 		this.caret.style.color = this.theme.caret_color;
 
 		this.right_scroll.style.background = this.theme.background;
 		this.bottom_scroll.style.background = this.theme.background;
-		/*
-		 * 得到剪贴板
-		 */
-		this.clipboard = Daisy.Clipboard.getInstance();
+
 		/**
 		 * 设置当前语言。
 		 */
@@ -170,11 +188,13 @@ if( typeof Daisy === 'undefined')
 		 * 初始化dom元素的事件处理
 		 */
 		this.initEvent();
-		
-		/*
-		 * 绘制画布
+
+		/**
+		 * 初始化时默认新建一个doument
 		 */
-		this.render.paint();
+		this.createDocument();
+		this.setActiveDocument(0);
+
 		this.caret.focus();
 	}
 
@@ -191,6 +211,7 @@ if( typeof Daisy === 'undefined')
 			this.theme.select_bg = T.selection.background;
 			this.theme.cur_line_bg = T.current_line.background;
 			this.theme.caret_color = T.caret.color;
+			this.theme.font_height = $.getFontHeight(this.theme.font);
 			this.theme.palettes = {};
 			for(var name in T.styles) {
 
@@ -198,11 +219,11 @@ if( typeof Daisy === 'undefined')
 					keys : [],
 					values : []
 				}
-				var j = 1,st=T.styles[name];
+				var j = 1, st = T.styles[name];
 				for(var s in st) {
 					var s_v = st[s];
-					s_v.font = (s_v.bold ? 'bold ' : '') + (s_v.italic ? 'italic ' : '') + (s_v.font!=null?s_v.font:this.theme.font);
-					s_v.color = s_v.color==null?this.theme.color:s_v.color;
+					s_v.font = (s_v.bold ? 'bold ' : '') + (s_v.italic ? 'italic ' : '') + (s_v.font != null ? s_v.font : this.theme.font);
+					s_v.color = s_v.color == null ? this.theme.color : s_v.color;
 					if(s === 'global') {
 						palette.keys.global = 0;
 						palette.values[0] = s_v;
@@ -215,23 +236,57 @@ if( typeof Daisy === 'undefined')
 				/**
 				 * 如果语言的主体没有定义全局字体，则使用整个主题的全局字体。
 				 */
-				if(palette.keys.global==null){
+				if(palette.keys.global == null) {
 					palette.keys.global = 0;
 					palette.values[0] = {
-						color:this.theme.color,
-						font:this.theme.font
+						color : this.theme.color,
+						font : this.theme.font
 					};
 				}
-					
+
 				this.theme.palettes[name] = palette;
 			}
-			
+
 		},
 		_setLanguage : function(language) {
 			this.lang_name = language;
 			this.palette = this.theme.palettes[language];
-			this.render.styles = this.palette.values;
-			this.lexer.setLexer(this.lang_name);
+			/**
+			 * 对render的theme（包括font、line_height等）和lexermanager的lexer进行更新。
+			 * 由于两个实例都保存了editor的引用（this.editor），所以不再需要传入参数。
+			 */
+			this.render.resetTheme();
+			this.lexer.resetLexer();
+		},
+		createDocument : function() {
+			this.docs.push(new Daisy._Document(this));
+			return this.docs.length - 1;
+		},
+		setActiveDocument : function(index) {
+			if(index < 0 || index >= this.docs.length)
+				throw "bad index of document";
+			var doc = this.docs[index];
+			if(doc === this.cur_doc)
+				return;
+
+			if(this.cur_doc !== null){
+				this.cur_doc.saved_caret = this.caret_position;
+				this.cur_doc.saved_scroll_offset = {
+					left : this.scroll_left,
+					top : this.scroll_top
+				}
+			}
+			this.cur_doc = doc;
+			this.render.resetDoc();
+		 	this.caret_position = this.cur_doc.saved_caret;
+			/*
+			 * 恢复scrollLeft、scrollTop和caret.
+			 * 在_setScroll函数中会调用 _resetCaret设置caret的位置。
+			 */
+			this._setScroll(this.cur_doc.saved_scroll_offset.left,this.cur_doc.saved_scroll_offset.top);
+		
+			this.setFocus(true);
+			this.render.paint();
 		},
 		_getEventPoint : function(e) {
 			var x = 0, y = 0;
@@ -260,7 +315,7 @@ if( typeof Daisy === 'undefined')
 			this.theme.font = font;
 
 		},
-		_setSize : function() {
+		_setDomSize : function() {
 
 			this.container.style.width = this.width + "px";
 			this.container.style.height = this.height + "px";
@@ -277,7 +332,7 @@ if( typeof Daisy === 'undefined')
 			this.client.style.height = this.canvas_height + "px";
 			this.canvas.width = this.render.buffer_width;
 			this.canvas.height = this.render.buffer_height;
-			this.render.resetContentSize();
+
 		},
 		resize : function(size) {
 			//this._setSize();
@@ -285,6 +340,7 @@ if( typeof Daisy === 'undefined')
 			//this.render.paint();
 		},
 		_setCaret : function(pos) {
+			//$.log(pos);
 			this.caret_position = pos;
 			//$.log(pos);
 			this._resetCaret();
@@ -301,7 +357,7 @@ if( typeof Daisy === 'undefined')
 		_moveCaret_xy : function(x, y) {
 			if(x < 0 || y < 0)
 				return;
-			this._setCaret(this.doc._getCaret_xy(x, y));
+			this._setCaret(this.cur_doc._getCaret_xy(x, y));
 		},
 		/**
 		 * 移动光标到第line行和colum列，这里line和colum的含义与 this.caret_position中一致，
@@ -312,7 +368,7 @@ if( typeof Daisy === 'undefined')
 			if(line < 0 || line > this.line_number - 1)
 				return;
 			//$.log("move_lc:" +line+","+colum);
-			this._setCaret(this.doc._getCaret_lc(line, colum));
+			this._setCaret(this.cur_doc._getCaret_lc(line, colum));
 		},
 		initEvent : function() {
 			var me = this;
@@ -321,7 +377,7 @@ if( typeof Daisy === 'undefined')
 			this.__pre_pos__ = null;
 			$.addEvent(this.canvas, 'mousedown', function(e) {
 				//$.log("down");
-				me.doc.select(null);
+				me.cur_doc.select(null);
 				var p = me._getEventPoint(e);
 				me._moveCaret_xy(p.x, p.y);
 				me.__mouse_down__ = true;
@@ -336,7 +392,7 @@ if( typeof Daisy === 'undefined')
 			$.addEvent(this.canvas, "dblclick", function(e) {
 				me.__mouse_down__ = false;
 				var p = me._getEventPoint(e);
-				me._setCaret(me.doc.selectWord(p.x, p.y));
+				me._setCaret(me.cur_doc.selectWord(p.x, p.y));
 				me.render.paint();
 				//e.preventDefault();
 			});
@@ -344,7 +400,7 @@ if( typeof Daisy === 'undefined')
 				me.__mouse_down__ = false;
 				var p = me._getEventPoint(e);
 				//$.log(e)
-				me._setCaret(me.doc.selectWord(this.offsetLeft + p.x, this.offsetTop + p.y));
+				me._setCaret(me.cur_doc.selectWord(this.offsetLeft + p.x, this.offsetTop + p.y));
 				me.render.paint();
 			});
 			$.addEvent(this.canvas, 'mouseup', function(e) {
@@ -361,12 +417,14 @@ if( typeof Daisy === 'undefined')
 			$.addEvent(this.canvas, 'mousemove', function(e) {
 				if(!me.__mouse_down__)
 					return;
-				var p = me._getEventPoint(e), pos = me.doc._getCaret_xy(p.x, p.y); out_if:
+				var p = me._getEventPoint(e), pos = me.cur_doc._getCaret_xy(p.x, p.y);
+				out_if:
 				if(pos.line !== me.__pre_pos__.line || pos.colum !== me.__pre_pos__.colum) {
 					me._setCaret(pos);
+					me.setFocus(true);
 					var from = me.__down_pos__, to = pos;
 					if(from.line === to.line && from.colum === to.colum && me.select_mode === true) {
-						me.doc.select(null);
+						me.cur_doc.select(null);
 						break out_if;
 					} else if(from.line > to.line || (from.line === to.line && from.colum > to.colum)) {
 						from = pos;
@@ -374,7 +432,7 @@ if( typeof Daisy === 'undefined')
 
 					}
 					//$.log("Select " + from.line + "," + from.colum + " to " + to.line + "," + to.colum);
-					me.doc.select(from, to);
+					me.cur_doc.select(from, to);
 
 					me.render.paint();
 					me.__pre_pos__ = pos;
@@ -384,7 +442,7 @@ if( typeof Daisy === 'undefined')
 				 * 如果当前游标的位置不在可见区域（即当前行的末尾没有显示），则滚动使之可见.
 				 * 当前使用的规则是滚动到当前行宽度减去15的位置。
 				 */
-				var cur_line = me.doc.line_info[pos.line];
+				var cur_line = me.cur_doc.line_info[pos.line];
 				if(cur_line.width < me.scroll_left)
 					me.scrollLeft(cur_line.width - 15);
 				/*
@@ -445,17 +503,17 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 8:
 						//退格（删除）
-						var new_pos = me.doc.backspace(me.caret_position);
+						var new_pos = me.cur_doc.backspace(me.caret_position);
 						me._moveCaret_lc(new_pos.line, new_pos.colum);
 						me.render.paint();
 						break;
 					case 9:
 						me.insertText("    ");
-
+						$.stopEvent(e);
 						break;
 					case 46:
 						//del键
-						var new_pos = me.doc.del(me.caret_position);
+						var new_pos = me.cur_doc.del(me.caret_position);
 						me._moveCaret_lc(new_pos.line, new_pos.colum);
 						me.render.paint();
 						break;
@@ -477,7 +535,7 @@ if( typeof Daisy === 'undefined')
 						break;
 					case 65:
 						if(e.ctrlKey) {
-							me._setCaret(me.doc.selectAll());
+							me._setCaret(me.cur_doc.selectAll());
 							me.render.paint();
 							$.stopEvent(e);
 						}
@@ -497,7 +555,7 @@ if( typeof Daisy === 'undefined')
 						}
 						break;
 				}
-				 
+
 			});
 
 			$.addEvent(this.caret, 'input', function(e) {
@@ -586,13 +644,13 @@ if( typeof Daisy === 'undefined')
 			});
 		},
 		copy : function(e) {
-			if(this.doc.select_mode)
-				this.clipboard.setText(e, this.doc.getSelectText());
+			if(this.cur_doc.select_mode)
+				this.clipboard.setText(e, this.cur_doc.getSelectText());
 		},
 		cut : function(e) {
-			if(this.doc.select_mode) {
-				this.clipboard.setText(e, this.doc.getSelectText());
-				var new_pos = this.doc.del(this.caret_position);
+			if(this.cur_doc.select_mode) {
+				this.clipboard.setText(e, this.cur_doc.getSelectText());
+				var new_pos = this.cur_doc.del(this.caret_position);
 				this._moveCaret_lc(new_pos.line, new_pos.colum);
 				this.render.paint();
 			}
@@ -659,6 +717,15 @@ if( typeof Daisy === 'undefined')
 			this.right_scroll.scrollTop = value;
 			this.canvas.style.top = -this.render.top_page_offset + "px";
 		},
+		_setScroll : function(left,top){
+			this.scroll_left = left;
+			this.scroll_top = top;
+			this.render.scrollLeft(this.scroll_left);
+			this.render.scrollTop(this.scroll_top);
+			this.canvas.style.left = -this.render.left_page_offset + "px";
+			this.canvas.style.top = -this.render.top_page_offset + "px";
+			this._resetCaret();
+		},
 		setFocus : function(isFocus) {
 			if(isFocus === true) {
 				this.focused = true;
@@ -672,14 +739,14 @@ if( typeof Daisy === 'undefined')
 			var c = this.caret_position;
 			switch(dir) {
 				case "left":
-					if(this.doc.select_mode && c.index !== this.doc.select_range.from.index)
-						this._setCaret(this.doc.select_range.from);
+					if(this.cur_doc.select_mode && c.index !== this.cur_doc.select_range.from.index)
+						this._setCaret(this.cur_doc.select_range.from);
 					else
 						this.leftCaret(c);
 					break;
 				case "right":
-					if(this.doc.select_mode && c.index !== this.doc.select_range.to.index)
-						this._setCaret(this.doc.select_range.to);
+					if(this.cur_doc.select_mode && c.index !== this.cur_doc.select_range.to.index)
+						this._setCaret(this.cur_doc.select_range.to);
 					else
 						this.rightCaret(c);
 					break;
@@ -690,7 +757,7 @@ if( typeof Daisy === 'undefined')
 					this.downCaret(c);
 					break;
 			}
-			this.doc.select_mode = false;
+			this.cur_doc.select_mode = false;
 
 			this.render.paint();
 		},
@@ -705,7 +772,7 @@ if( typeof Daisy === 'undefined')
 			}
 		},
 		rightCaret : function(c) {
-			if(c.colum === this.doc.line_info[c.line].length - 1) {
+			if(c.colum === this.cur_doc.line_info[c.line].length - 1) {
 				this._moveCaret_lc(c.line + 1, -1);
 			} else {
 				this._moveCaret_lc(c.line, c.colum + 1)
@@ -718,7 +785,7 @@ if( typeof Daisy === 'undefined')
 			this._moveCaret_xy(c.left, c.top - this.render.line_height);
 		},
 		insertText : function(text) {
-			var new_pos = this.doc.insert(text, this.caret_position);
+			var new_pos = this.cur_doc.insert(text, this.caret_position);
 			this._moveCaret_lc(new_pos.line, new_pos.colum);
 			this.render.paint();
 
@@ -726,7 +793,7 @@ if( typeof Daisy === 'undefined')
 
 		},
 		appendText : function(text) {
-			this.doc.append(text);
+			this.cur_doc.append(text);
 			this.render.paint();
 		},
 		focus : function() {

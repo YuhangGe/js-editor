@@ -2,9 +2,10 @@ $(function(){
 	d_editor = new Daisy._Editor({
 		width: 400,
 		height: 300,
-		language : 'visualbasic',
+		language : 'javascript',
 		theme : 'notepadplusplus'
 	});
+	
 	var str=$('#test').val();
 	//var s2 ="123456789abcdefgh\n123456789abcdefghigklm\n";//"1234456789abcdefghigklmnopqrstuvwxyzABCDEFGHIGKLMNOPQRSTUVWXYZ";
 	//s2+=s2+s2+s2;
@@ -25,6 +26,17 @@ function deal_input(txt){
 	$.log(txt.value);
 
 	//txt.value="";
+}
+var cur_doc = 0, doc_len = 1;
+function c_doc(){
+	cur_doc = d_editor.createDocument();
+	d_editor.setActiveDocument(cur_doc);
+	d_editor.appendText("I Love Daisy!\n");
+	doc_len++;
+}
+function s_doc(){
+	cur_doc=(cur_doc+1) % doc_len;
+	d_editor.setActiveDocument(cur_doc);
 }
 function do_test(){
 	//d_editor.resize({width:600,height:380});

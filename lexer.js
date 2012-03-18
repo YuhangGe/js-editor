@@ -42,7 +42,8 @@ Daisy._LexerManager = function(editor){
 	//this.lexer_worker.onmessage = this.onlexer;
 }
 Daisy._LexerManager.prototype = {
-	setLexer : function(name){
+	resetLexer : function(){
+		var name = this.editor.lang_name;
 		if(this.lexer_hash[name]==null)
 			this.lexer_hash[name]=new Daisy.Lexer[name](this.editor);
 		this.lexer = this.lexer_hash[name];
@@ -58,7 +59,7 @@ Daisy._LexerManager.prototype = {
 				me.lexer.lex();
 				//$.log('lex time: '+ (new Date().getTime()-f_t))
 				for(var i=0;i<me.check_line.length;i++){
-					me.editor.doc.line_info[me.check_line[i]].check_width = true;
+					me.editor.cur_doc.line_info[me.check_line[i]].check_width = true;
 				}
 				//$.log(me.check_line.length);
 				me.check_line.length = 0;
@@ -86,13 +87,13 @@ Daisy._LexerManager.prototype = {
 		 */
 		//return
 		
-		//$.log(this.editor.doc.text_array.length)
+		//$.log(this.editor.cur_doc.text_array.length)
 		/**
 		 * 如果文本量少于this.DELAY_LEN，则及时进行lex，这样可以快速地显示颜色，而且不需要进行两次paint
 		 * 但当文本量太多时，lex操作反而会影响响应，则需要延迟进行。
 		 * 尝试用Worker类未果，因为Worker线程之间数据传输都是structured copy。不能直接共享数据。。。。
 		 */
-		if(this.editor.doc.text_array.length<this.DELAY_LEN){
+		if(this.editor.cur_doc.text_array.length<this.DELAY_LEN){
 			this.lexer.lex();
 		}else{
 			this._delayLex(lines);

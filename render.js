@@ -4,9 +4,9 @@ if( typeof Daisy === 'undefined')
 	Daisy._Render = function(editor) {
 		this.editor = editor;
 		this.ctx = editor.ctx;
-		this.theme = editor.theme;
-		this.doc = editor.doc;
-		this.styles = [];
+		this.theme = null;
+		this.doc = null;
+		this.styles = null;
 		//$.log(this.theme);
 		this.lexer = editor.lexer;
 		this.width = editor.canvas_width;
@@ -26,10 +26,8 @@ if( typeof Daisy === 'undefined')
 		this.left_page_offset = 0;
 		this.top_page_size = 0;
 		this.top_page_offset = 0;
-		//$.log(this.buffer_height);
-		//$.log(this.line_height);
-		this.ctx.font = this.theme.font;
-		this.line_height = this._getLineHeight();
+		
+		this.line_height = 0;
 
 		this.region = {
 			left : 0,
@@ -41,22 +39,24 @@ if( typeof Daisy === 'undefined')
 			start_line : -1,
 			end_line : -1
 		};
-		this.resetRegion();
+		
 
 	};
 	Daisy._Render.prototype = {
-		_getLineHeight : function() {
-			var ele = document.createElement("span"), h = 0;
-			ele.style.font = this.theme.font;
-			ele.style.margin = "0px";
-			ele.style.padding = "0px";
-			ele.style.visibility = "hidden";
-			ele.innerHTML = "Abraham 04-02.I Love Daisy.南京大学";
-			document.body.appendChild(ele);
-			h = ele.offsetHeight;
-			document.body.removeChild(ele);
-			return h;
+		resetTheme : function(){
+			this.theme = this.editor.theme;
+			this.ctx.font = this.theme.font;
+			this.styles = this.editor.palette.values;
+			this.line_height = this.theme.font_height;
+			//$.log(this.line_height);
 		},
+		resetDoc : function(){
+			this.doc = this.editor.cur_doc;
+			this.resetRegion();
+			this.resetRenderWidth();
+			this.resetRenderHeight();
+		},
+		
 		getCharWidth : function(chr, index) {
 			var bold = this.styles[this.doc.style_array[index]].bold;
 			this.ctx.font = ( bold ? 'Bold ' : '') + this.theme.font;
@@ -135,14 +135,14 @@ if( typeof Daisy === 'undefined')
 			this.editor.right_scroll_body.style.height = c_height + "px";
 
 		},
-		resetContentSize : function() {
-			/**
-			 * 重新设置内容大小。比如当最长的一行长度发生变化，或者行数发生变化时，
-			 * 需要重新设置新的滚动值（scroll_top,scroll_left）等。
-			 */
-			this.resetRenderWidth();
-			this.resetRenderHeight();
-		},
+		// resetContentSize : function() {
+			// /**
+			 // * 重新设置内容大小。比如当最长的一行长度发生变化，或者行数发生变化时，
+			 // * 需要重新设置新的滚动值（scroll_top,scroll_left）等。
+			 // */
+			// this.resetRenderWidth();
+			// this.resetRenderHeight();
+		// },
 		_paintSelect : function(select_range) {
 			var f = select_range.from, t = select_range.to, lines = this.doc.line_info;
 			var s, s_colum, e, e_colum;
