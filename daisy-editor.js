@@ -454,29 +454,29 @@ if( typeof Daisy === 'undefined')
 				/*
 				 * 如果当前游标接近边缘，则自动滚动使显示更多
 				 */
-				var dl = p.x - me.scroll_left, dr = dl - me.canvas_width, du = p.y - me.scroll_top, dd = du - me.canvas_height;
-				if(dl <= 5) {
-					/*
-					 * 接近左边缘，直接滚动。
-					 */
-					//me._scrollLeft(dl);
-					me.adjustScroll();
-				} else if(dr >= -5 && cur_line.width > me.scroll_left + me.width) {
-					/*
-					 * 接近右边缘，还需要满足当前行未显示到末尾，才滚动
-					 */
-					//me._scrollRight(dr);
-					me.adjustScroll();
-				}
-				if(du <= 5) {
-					me.adjustScroll();
-					//me._scrollUp(du);
-				} else if(dd >= -5) {
-					me.adjustScroll();
-					//me._scrollDown(dd);
-					//$.log("sdown:"+dd);
-				}
-
+				// var dl = p.x - me.scroll_left, dr = dl - me.canvas_width, du = p.y - me.scroll_top, dd = du - me.canvas_height;
+				// if(dl <= 5) {
+					// /*
+					 // * 接近左边缘，直接滚动。
+					 // */
+					// //me._scrollLeft(dl);
+					// me.adjustScroll();
+				// } else if(dr >= -5 && cur_line.width > me.scroll_left + me.width) {
+					// /*
+					 // * 接近右边缘，还需要满足当前行未显示到末尾，才滚动
+					 // */
+					// //me._scrollRight(dr);
+					// me.adjustScroll();
+				// }
+				// if(du <= 5) {
+					// me.adjustScroll();
+					// //me._scrollUp(du);
+				// } else if(dd >= -5) {
+					// me.adjustScroll();
+					// //me._scrollDown(dd);
+					// //$.log("sdown:"+dd);
+				// }
+ 				me.adjustScroll();
 				$.stopEvent(e);
 			});
 
