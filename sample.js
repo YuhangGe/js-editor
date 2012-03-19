@@ -23,7 +23,7 @@ function open_jquery() {
 }
 
 function insert_text() {
-	var str = (cur_doc === 0 ? "\n/**\n * Hello Daisy.\n * Hello World\n **/\n" : "\n''' Hello Daisy\n''' Hello World\n");
+	var str = (d_editor.lang_name==='javascript'? "\n/**\n * Hello Daisy.\n * Hello World\n **/\n" : "\n''' Hello Daisy\n''' Hello World\n");
 	d_editor.insertText(str);
 	d_editor.focus();
 }
