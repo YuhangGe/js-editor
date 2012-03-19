@@ -2,10 +2,12 @@
 <html>
     <head>
         <title>Daisy Editor</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+         <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
         <script type="text/javascript" src="jquery-1.5.1.js"></script>
       	<script type="text/javascript" src="js-printf.js"></script>
+      	<script type="text/javascript" src="utility.js"></script>
         <script type="text/javascript" src="daisy-editor.js"></script>
+        <script type="text/javascript" src="events.js"></script>
         <script type="text/javascript" src="document.js"></script>
         <script type="text/javascript" src="render.js"></script>
         <script type="text/javascript" src="lexer.js"></script>
@@ -133,10 +135,12 @@
     		</div>
     		<div class="content">
     			<div>
-       				<input type="button" value="append jQuery源码" onclick="append_jquery(this);" />
-       				<input type="button" value="insert 文本" onclick="insert_text()";/>
+       				<input type="button" value="insert 文本" onclick="insert_text();";/>
+       				<input id="btn_new" type="button" value="新建vb文件" onclick="new_vb_doc();" />
+       				<input type="button" id="btn_jq" value="打开jQuery源码" onclick="open_jquery();" />
+       				<input id="btn_sw" type="button" value="切换文件" disabled="true" onclick="switch_doc();" />
        			</div>
-    			<div style="position: relative;">
+    				<div style="">
 		      		<div id="d-editor">
 		      			<div id="d-client">
 		      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>

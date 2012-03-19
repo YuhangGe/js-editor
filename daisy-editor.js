@@ -228,12 +228,14 @@ if( typeof Daisy === 'undefined')
 			};
 		},
 		_getEventPoint_chrome : function(e){
+			//$.log(e);
 			var x = e.x,y=e.y;
-			x-= this.container.offsetLeft-document.body.scrollLeft;
-			y-= this.container.offsetTop-document.body.scrollTop;
+			//jQuery.dprint("e : %d,%d,%d,%d",e.y,document.body.scrollTop,this.scroll_top,this.render.top_page_offset)
+			x -= this.container.offsetLeft+document.body.scrollLeft;
+			y -= this.container.offsetTop+document.body.scrollTop;
 			return {
-				x : x + this.scroll_left - this.render.left_page_offset,
-				y : y + this.scroll_top - this.render.top_page_offset
+				x : x + this.scroll_left,
+				y : y + this.scroll_top
 			};
 		},
 		setFontName : function(name) {

@@ -138,7 +138,7 @@ if( typeof Daisy.Lexer === 'undefined')
 						break;
 					case 9:
 						this.yystyle = "comment";
-						this.yydefault = "blockcomment";
+						this.yydefault = "comment";
 						this.yygoto(BLOCK_COMMENT);
 						break;
 					case 1:

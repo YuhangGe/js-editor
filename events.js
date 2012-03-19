@@ -1,5 +1,5 @@
 /**
- *
+ * 事件处理
  */
 if( typeof Daisy === 'undefined')
 	Daisy = {};
@@ -25,7 +25,7 @@ if( typeof Daisy === 'undefined')
 		_mousedown_handler : function(e) {
 			this.cur_doc.select(null);
 			var p = this._getEventPoint(e);
-			//jQuery.log(p)
+			//jQuery.log(p.y)
 			this._moveCaret_xy(p.x, p.y);
 			this.__mouse_down__ = true;
 			this.__pre_pos__ = this.caret_position;
@@ -82,6 +82,33 @@ if( typeof Daisy === 'undefined')
 			var p = this._getEventPoint(e), pos = this.cur_doc._getCaret_xy(p.x, p.y);
 			this._mousemove_handler_deal(pos);
 			$.stopEvent(e);
+		},
+		_chrome_mousemove_handler : function(e) {
+			if(!this.__mouse_down__)
+				return;
+			//$.log('mv')
+			var p = this._getEventPoint_chrome(e);
+			//jQuery.dprint("%d,%d",p.x,p.y);
+			var pos = this.cur_doc._getCaret_xy(p.x, p.y);
+			//$.log(pos.line)
+			this._mousemove_handler_deal(pos);
+			$.stopEvent(e);
+		},
+		_chrome_mouseup_handler : function(e) {
+
+			this.__mouse_down__ = false;
+
+			this.render.paint();
+
+			$.delEvent(document.body, 'mousemove', this.__cmv_handler);
+			$.delEvent(document.body, 'mouseup', this.__cmu_handler);
+
+		},
+		_chrome_mousedown_handler : function(e) {
+			this._mousedown_handler(e);
+
+			$.addEvent(document.body, 'mousemove', this.__cmv_handler);
+			$.addEvent(document.body, 'mouseup', this.__cmu_handler);
 		},
 		_keydown_handler : function(e) {
 			//$.log(e.ctrlKey);
@@ -233,32 +260,6 @@ if( typeof Daisy === 'undefined')
 			this._setCaret(this.cur_doc.selectWord(p.x, p.y));
 			this.render.paint();
 			//e.preventDefault();
-		},
-		_chrome_mousemove_handler : function(e) {
-			if(!this.__mouse_down__)
-				return;
-			//$.log('mv')
-			var p = this._getEventPoint_chrome(e);
-			//fjQuery.dprint("%d,%d",p.x,p.y);
-			var pos = this.cur_doc._getCaret_xy(p.x, p.y);
-			this._mousemove_handler_deal(pos);
-			$.stopEvent(e);
-		},
-		_chrome_mouseup_handler : function(e) {
-
-			this.__mouse_down__ = false;
-
-			this.render.paint();
-
-			$.delEvent(document.body, 'mousemove', this.__cmv_handler);
-			$.delEvent(document.body, 'mouseup', this.__cmu_handler);
-
-		},
-		_chrome_mousedown_handler : function(e) {
-			this._mousedown_handler(e);
-
-			$.addEvent(document.body, 'mousemove', this.__cmv_handler);
-			$.addEvent(document.body, 'mouseup', this.__cmu_handler);
 		},
 		initEvent : function() {
 			var me = this;
