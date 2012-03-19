@@ -1,6 +1,6 @@
 /**
  * Daisy Editor
- * ——基于canvas的代码高亮编辑器（在线演示：http://yuhanghome.net/daisy-editor）
+ * ——基于canvas的代码高亮编辑器（在线演示：http://yuhanghome.net/daisy-editor ）
  *
  * @author      Abraham
  * @website     http://yuhanghome.net
