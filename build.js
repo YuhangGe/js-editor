@@ -1,11 +1,13 @@
 (function() {
-	var jsp = require("./lib/uglify-js").parser,
+	var fs = require("fs"),
+		jsp = require("./lib/uglify-js").parser,
 		pro = require("./lib/uglify-js").uglify,
 		cssmin = require("./lib/css-compressor").cssmin;
 	
 	var log = function(msg){
 		console.log(msg);
 	}
+	
 	var orig_code = "var a = 3+6;";
 	// parse code and get the initial AST
 	var ast = jsp.parse(orig_code);

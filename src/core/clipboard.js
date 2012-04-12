@@ -33,8 +33,8 @@
 	}
 	Daisy.Clipboard.__instance__ = null;
 	Daisy.Clipboard.getInstance = function() {
-		if(C.__instance__ === null)
-			C.__instance__ = new C();
-		return C.__instance__;
+		if(Daisy.Clipboard.__instance__ === null)
+			Daisy.Clipboard.__instance__ = new Daisy.Clipboard();
+		return Daisy.Clipboard.__instance__;
 	}
 })(Daisy, Daisy.$);

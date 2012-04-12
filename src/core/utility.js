@@ -1,12 +1,8 @@
-/**
- * 全局命名空间Daisy.
- */
-Daisy = {
-	$ : function(id){
-		return document.getElementById(id);
-	}
-};
-(function($){
+(function(Daisy,$){
+	/**
+	 * 对辅助函数类 $ 进行扩充，实现常用的方法。包括事件绑定和删除，浏览器判断等。
+	 * 没有直接使用jQuery或是其它库的原因是希望Daisy Editor的独立性。
+	 */
 	var ua = navigator.userAgent.toLowerCase();
 	var s;
 	( s = ua.match(/msie ([\d.]+)/)) ? $.ie = s[1] : ( s = ua.match(/firefox\/([\d.]+)/)) ? $.firefox = s[1] : ( s = ua.match(/chrome\/([\d.]+)/)) ? $.chrome = s[1] : ( s = ua.match(/opera.([\d.]+)/)) ? $.opera = s[1] : ( s = ua.match(/version\/([\d.]+).*safari/)) ? $.safari = s[1] : 0;
@@ -263,4 +259,4 @@ Daisy = {
 				throw "extend error!"
 		}
 	}
-})(Daisy.$);
+})(Daisy,Daisy.$);
