@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=GB2312">
+		<title>Backpager - Online Markdown Editor</title>
+		<meta http-equiv="pragma" content="no-cache">
+		<meta http-equiv="cache-control" content="no-cache">
+		<meta http-equiv="pragma-directive" content="no-cache">
+		<meta http-equiv="cache-directive" content="no-cache">
+		<meta http-equiv="expires" content="0">
+
+		<link rel="stylesheet" type="text/css" href="Backpager_files/gcss.css">
+		<script type="text/javascript" src="Backpager_files/jquery.js"></script>
+		<script src="Backpager_files/gjs.js" async="" type="text/javascript"></script>
+
+	
+	<script src="Backpager_files/showdown.js"></script>
+	<script src="Backpager_files/wmd-base.js"></script>
+	<script src="Backpager_files/wmd-plus.js"></script>
+	
+	</head>
+	
+	<body><h1 id="header"><a href="http://backpager.amasan.co.uk/">Backpager</a> - Online Markdown Editor</h1><div id="topnav">
+	<a id="copy-description">Copy to Clipboard</a>
+	<div style="position: absolute; left: 0px; top: 9px; width: 99px; height: 15px; z-index: 99;" id="zclip-ZeroClipboardMovie_1" class="zclip"><embed id="ZeroClipboardMovie_1" src="Backpager_files/ZeroClipboard.swf" loop="false" menu="false" quality="best" bgcolor="#ffffff" name="ZeroClipboardMovie_1" allowscriptaccess="always" allowfullscreen="false" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" flashvars="id=1&amp;width=99&amp;height=15" wmode="transparent" height="15" width="99" align="middle"></div></div>
+		<div id="wrapper">
+			<div id="left">
+				<div style="margin: 0pt; padding: 0pt; clear: none; float: left; text-align: left; position: relative; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; visibility: visible; width: 0px; left: 0px; top: 0px; display: inline; overflow: visible; opacity: 0.999;"><div style="margin: 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: block; z-index: 100; width: 927px; height: 6px; opacity: 0.999;"><span style="margin: 0pt; padding: 0pt 65px 2px 15px; clear: none; float: none; text-align: left; position: absolute; line-height: 0; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; height: auto; display: block;"><img title="Strong &lt;strong&gt; Ctrl+B" src="Backpager_files/bold.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Emphasis &lt;em&gt; Ctrl+I" src="Backpager_files/italic.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img src="Backpager_files/separator.png" style="margin: 0pt; padding: 0px 4px 4px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 20px; height: 20px;" border="0"><img title="Hyperlink &lt;a&gt; Ctrl+L" src="Backpager_files/link.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Blockquote &lt;blockquote&gt; Ctrl+." src="Backpager_files/blockquote.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Code Sample &lt;pre&gt;&lt;code&gt; Ctrl+K" src="Backpager_files/code.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Image &lt;img&gt; Ctrl+G" src="Backpager_files/img.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img src="Backpager_files/separator.png" style="margin: 0pt; padding: 0px 4px 4px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 20px; height: 20px;" border="0"><img title="Numbered List &lt;ol&gt; Ctrl+O" src="Backpager_files/ol.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Bulleted List &lt;ul&gt; Ctrl+U" src="Backpager_files/ul.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Heading &lt;h1&gt;/&lt;h2&gt; Ctrl+H" src="Backpager_files/h1.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img title="Horizontal Rule &lt;hr&gt; Ctrl+R" src="Backpager_files/hr.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 1; cursor: pointer;" border="0"><img src="Backpager_files/separator.png" style="margin: 0pt; padding: 0px 4px 4px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 20px; height: 20px;" border="0"><img title="Undo - Ctrl+Z" src="Backpager_files/undo.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 0.4;" border="0"><img title="Redo - Ctrl+Y" src="Backpager_files/redo.png" style="margin: 7px 0px 5px; padding: 1px; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: 1px solid transparent; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline; width: 16px; height: 16px; opacity: 0.4;" border="0"></span><a title="WMD: The Wysiwym Markdown Editor" target="_blank" href="http://www.wmd-editor.com/" style="margin: 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; right: 10px; top: 5px; display: inline; width: 50px; height: 25px; cursor: pointer;"><img src="Backpager_files/wmd.png" style="margin: 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: relative; line-height: 1em; border: medium none; color: black; background-repeat: no-repeat; background-image: none; min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; display: inline;" border="0"></a><div style="margin: 0pt 0pt 0pt 50%; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: no-repeat; background-image: url(&quot;Backpager_files/images/bg.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 14px; max-width: 90000px; overflow: hidden; height: 14px; width: 50%; bottom: -28px; z-index: -1000; background-position: right bottom;"></div><div style="margin: 0pt 0pt 0pt 50%; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: no-repeat; background-image: url(&quot;Backpager_files/images/bg.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 14px; max-width: 90000px; overflow: hidden; height: 14px; width: 50%; top: 0pt; z-index: -1000; background-position: right top;"></div><div style="margin: 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: no-repeat; background-image: url(&quot;Backpager_files/images/bg.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 14px; max-width: 90000px; overflow: hidden; height: 14px; width: 50%; bottom: -28px; z-index: -1000; left: 0pt; background-position: left bottom;"></div><div style="margin: 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: no-repeat; background-image: url(&quot;Backpager_files/images/bg.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 14px; max-width: 90000px; overflow: hidden; height: 14px; width: 50%; top: 0pt; z-index: -1000; left: 0pt; background-position: left top;"></div><div style="margin: 14px 0pt 0pt; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: repeat-y; background-image: url(&quot;Backpager_files/images/bg-fill.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; overflow: hidden; height: 100%; width: 50%; z-index: -1000; background-position: left top;"></div><div style="margin: 14px 0pt 0pt 50%; padding: 0pt; clear: none; float: none; text-align: left; position: absolute; line-height: 0px; border: medium none; color: black; background-repeat: repeat-y; background-image: url(&quot;Backpager_files/images/bg-fill.png&quot;); min-height: 0pt; min-width: 0pt; max-height: 90000px; max-width: 90000px; overflow: hidden; height: 100%; width: 50%; z-index: -1000; background-position: right top;"></div></div></div><textarea style="margin-top: 37px;" class="edit"></textarea>
+			</div>
+			<div class="ui-tabs ui-widget ui-widget-content ui-corner-all" id="tabs">
+				<ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+					<li class="ui-state-default ui-corner-top ui-tabs-selected ui-state-active"><a href="#tabs-1">Preview</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#tabs-2">Source</a></li>
+					<li class="ui-state-default ui-corner-top"><a href="#ui-tabs-1">Syntax</a></li>
+				</ul>
+				<div class="wmd-preview ui-tabs-panel ui-widget-content ui-corner-bottom" id="tabs-1"></div>
+				<div class="wmd-output ui-tabs-hide ui-tabs-panel ui-widget-content ui-corner-bottom" id="tabs-2"><pre><code></code></pre></div><div class="ui-tabs-panel ui-widget-content ui-corner-bottom ui-tabs-hide" id="ui-tabs-1">
+				    <div id="guideTitle">Markdown Syntax Reference</div>
+        <div id="guideSubtitle">Squarespace Mini-Reference</div>
+
+
+<h3>Phrase Emphasis</h3>
+
+<pre><code>*italic*   **bold**
+_italic_   __bold__
+</code></pre>
+
+<h3>Links</h3>
+
+<p>Inline:</p>
+
+<pre><code>An [example](http://url.com/ "Title")
+</code></pre>
+
+<p>Reference-style labels (titles are optional):</p>
+
+<pre><code>An [example][id]. Then, anywhere
+else in the doc, define the link:
+
+   [id]: http://example.com/  "Title"
+</code></pre>
+
+<h3>Images</h3>
+
+<p>Inline (titles are optional):</p>
+
+<pre><code>![alt text](/path/img.jpg "Title")
+</code></pre>
+
+<p>Reference-style:</p>
+
+<pre><code>![alt text][id]
+
+    [id]: /url/to/img.jpg "Title"
+</code></pre>
+
+<h3>Headers</h3>
+
+<p>Setext-style:</p>
+
+<pre><code>Header 1
+========
+
+Header 2
+--------
+
+</code></pre>
+
+<p>atx-style (closing #'s are optional):</p>
+
+<pre><code># Header 1 #
+
+
+</code></pre>
+
+<h3>Lists</h3>
+
+<p>Ordered, without paragraphs:</p>
+
+<pre><code>1.  Foo
+2.  Bar
+</code></pre>
+
+<p>Unordered, with paragraphs:</p>
+
+<pre><code>*   A list item.
+
+    With multiple paragraphs.
+
+*   Bar
+</code></pre>
+
+<p>You can nest them:</p>
+
+<pre><code>*   Abacus
+    * ass
+*   Bastard
+    1.  bitch
+    2.  bupkis
+        * BELITTLER
+    3. burper
+*   Cunning
+</code></pre>
+
+<h3>Blockquotes</h3>
+
+<pre><code>&gt; Email-style angle brackets
+
+&gt; are used for blockquotes.
+
+&gt; &gt; And, they can be nested.
+
+</code></pre>
+
+<h3>Code Spans</h3>
+
+<pre><code>`&lt;code&gt;` spans are delimited
+by backticks.
+
+You can include literal backticks
+like `` `this` ``.
+</code></pre>
+
+<h3>Preformatted Code Blocks</h3>
+
+<p>Indent every line of a code block by at least 4 spaces or 1 tab, and use a colon at the end of the preceding paragraph.</p>
+
+<pre><code>This is a normal paragraph:
+
+    This is a preformatted
+    code block.
+
+</code></pre>
+
+<h3>Horizontal Rules</h3>
+
+<p>Three or more dashes or asterisks:</p>
+
+<pre><code>---
+
+* * *
+
+- - - -
+</code></pre>
+
+<h3>Manual Line Breaks</h3>
+
+<p>End a line with two or more spaces:</p>
+
+<pre><code>Roses are red,
+Violets are blue.
+</code></pre>
+				
+				</div>
+			</div>
+		</div>
+		<div id="footer"><a href="http://backpager.amasan.co.uk/getstarted">Get Started</a><a href="http://amasan.co.uk/blog/about/" target="_blank">Feedback welcome</a>  Backpager is a project of Sander van Dragt</div>
+		<script type="text/javascript" src="Backpager_files/wmd.js"></script>
+	
+
+</body></html>

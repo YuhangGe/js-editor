@@ -1,0 +1,10 @@
+{
+  "name"          : "css-compressor",
+  "description"   : "YUI Compressor cssmin as a node.js module",
+  "keywords"      : ["css", "cssmin", "compressor", "yui compressor"],
+  "author"        : "Stoyan Stefanov, Isaac Schlueter, Julien Lecomte",
+  "contributors"  : ["Fabricio C Zuardi <fabricio@fabricio.org>"],
+  "repositories"  : [{"type": "git","url": "git://github.com/fczuardi/commonjs-ansi-color.git"}],
+  "version"       : "1.0.0",
+  "main"          : "./index"
+}
