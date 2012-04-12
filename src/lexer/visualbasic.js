@@ -2,7 +2,7 @@
 	/**
 	 * visual basic词法分析器
 	 */
-	(function(D, L) {
+	(function(L) {
 		var DEFAULT = 156, COMMENT = 157, STRING_A = 158;
 
 		L.visualbasic = function(editor) {
@@ -180,5 +180,5 @@
 			}
 		}
 
-	})(Daisy, Daisy.Lexer);
+	})(Daisy.Lexer);
 })(Daisy, Daisy.$);

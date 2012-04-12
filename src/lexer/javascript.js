@@ -3,7 +3,7 @@
 	 * javascript 词法解析器。
 	 * 由AliceLe词法分析器自动生成工具生成
 	 */
-	(function(D, L) {
+	(function(L) {
 		var DEFAULT = 156, LINE_COMMENT = 157, BLOCK_COMMENT = 158, DOC_COMMENT = 159, STRING_A = 160, STRING_B = 161;
 		L.javascript = function(editor) {
 			this.editor = editor;
@@ -234,5 +234,5 @@
 			}
 		}
 
-	})(Daisy, Daisy.Lexer);
+	})(Daisy.Lexer);
 })(Daisy, Daisy.$);
