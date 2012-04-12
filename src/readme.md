@@ -1,6 +1,10 @@
 ###代码命名空间及相关约定
 1. 在editor/utility.js中会首先定义全司命名空间**Daisy**.这是[editor](http://editor.xiaoge.me)唯一的对外接口。
 2. 在剩下的所有代码文件中，代码包装在如下格式中:  
+```html
+<script src="js/Three.js"></script>
+```
+
 ```html  
     (function(Daisy,$){  
     /**  
