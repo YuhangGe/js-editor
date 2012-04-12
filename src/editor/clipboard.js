@@ -1,15 +1,13 @@
-if( typeof Daisy === 'undefined')
-	Daisy = {};
-/**
- * 模拟的剪贴板，在firefox下不能直接向系统剪贴板中写入数据。
- * 使用单例模式。
- */
-Daisy.Clipboard = function() {
-	this.text = "";
-}; 
+(function(Daisy, $) {
+	/**
+	 * 模拟的剪贴板，在firefox下不能直接向系统剪贴板中写入数据。
+	 * 使用单例模式。
+	 */
+	Daisy.Clipboard = function() {
+		this.text = "";
+	};
 
-(function(C) {
-	C.prototype = {
+	Daisy.Clipboard.prototype = {
 		getText : function(e) {
 			var clip = window.clipboardData;
 			if(e && e.clipboardData)
@@ -33,11 +31,10 @@ Daisy.Clipboard = function() {
 			$.dprint("set clip: %s", txt);
 		}
 	}
-
-	C.__instance__ = null;
-	C.getInstance = function() {
+	Daisy.Clipboard.__instance__ = null;
+	Daisy.Clipboard.getInstance = function() {
 		if(C.__instance__ === null)
 			C.__instance__ = new C();
 		return C.__instance__;
 	}
-})(Daisy.Clipboard);
+})(Daisy, Daisy.$);
