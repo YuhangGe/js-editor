@@ -10,7 +10,7 @@ $(function() {
 });
 function open_jquery() {
 	$('#btn_jq').attr("disabled", true).val("正在从网络加载...");
-	$.get("../lib/jquery-1.7.2.js", function(data) {
+	$.get("jquery-1.7.2.js", function(data) {
 		cur_doc = d_editor.createDocument({
 			language : 'javascript'
 		});
