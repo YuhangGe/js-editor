@@ -1,136 +1,42 @@
 <!doctype html>
-<html>
-    <head>
-        <title>Daisy Editor</title>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-        <script type="text/javascript" src="../lib/jquery-1.7.2.min.js"></script>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Daisy Editor - Demo</title>
+<meta name="keywords" content="editor canvas javascript highlight" />
+<meta name="description" content="基于canvas元素的在线高亮代码编辑器" />
+<link href="styles.css" rel="stylesheet" type="text/css" media="screen" />
+<link rel="stylesheet" href="editor.css" type="text/css" />
+ <script type="text/javascript" src="../lib/jquery-1.7.2.min.js"></script>
       	<script type="text/javascript" src="../daisy-editor.min.js"></script>
         <script type="text/javascript" src="demo.js"></script>
-    
-    	<style type="text/css">
-    		*{
-    			margin:0px;
-    			padding:0px;
-    		}
-    		#d-canvas{
-    			cursor: text;
-    			margin: 0px;
-    			outline: none;
-    			position: relative;
-    			left: 0px;
-    			top: 0px;
-    		}
-    		
-    		#d-editor{
-    			width: 425px;
-    			height: 378px;
-    			padding: 0px;
-    			border: 1px solid blue;
-    			overflow: hidden;
-    			position: relative;
-    			outline: none;
-    		
-    		}
-    		
-    		#d-client{
-    			overflow: hidden;
-    			position: absolute;
-    			left : 0px;
-    			top : 0px;
-    		}
-    		#d-caret{
-    			position:absolute;
-    			display:block;
-    			width:1px;
-    			background:transparent;
-       			left:0px;
-    			top: 0px;
-    			padding: 0px;
-   				margin:0px;
-    			outline:none;
-    			border:none;
-    			resize:none;
-    			/*
-    			 * important! overflow hidden in chrome
-    			 */
-    			overflow: hidden;
-    		}
-    		#d-rightscroll {
-    			position: absolute;
-    			width: 17px;
-    			height: 300px;
-    			left: 300px;
-    			top: 0px;
-    			overflow-x: hidden;
-    			overflow-y: scroll;
-    		
-    		}
-    		#d-rightscroll-body{
-    			height: 500px;
-    			width: 1px;
-    		}
-    		#d-bottomscroll{
-    			position: absolute;
-    			height: 23px;
-    			width: 400px;
-    			left: 0px;
-    			top: 350px;
-    			overflow-x: scroll;
-    			overflow-y: hidden;
-    		
-    		}
-    		#d-bottomscroll-body{
-    			width: 500px;
-    			height: 1px;
-    		}
-    		
-    		
-    		body{
-    			text-align:center;	
-    		}
-    		a {
-    			color: #336699;
-    		}
-    		.out_body{
-    			width: 700px;
-    			margin:auto;
-    			text-align:left;
-    		}
-    		.head{
-    			margin-bottom: 20px;
-    		}
-    		.head h1{
-    			margin: 10px 0px;
-    		}
-    		.head h1 a{
-    			font-size: 16px;
-    			float: right;
-    			margin: 20px;
-    		}
-    		.content{
-    			
-    		}
-    		.foot{
-    			margin-top: 20px;
-    			text-align: center;
-    		}
-    	</style>
-    </head>
-    <body>
-    	<div class="out_body">
-    		<div class="head">
-    			<h1>Daisy Editor<a href="https://github.com/YuhangGe/daisy-editor" target="_black">去GitHub关注</a></h1>
-    			<h4>——基于canvas的代码高亮编辑器</h4>
-    		</div>
-    		<div class="content">
-    			<div>
+</head>
+<body>
+
+<div id="content">
+<!-- header begins -->
+<div id="header">
+  	<div id="logo"> 
+    	<div id="logo_t">
+            <span id="logo_t2">Daisy Editor</span><br />
+            <p>基于html5的canvas元素的高亮代码编辑器</p>
+        </div>
+    </div>
+   
+</div>
+
+<!-- header ends -->
+<!-- content begins -->
+ <div id="main">
+	<div id="right">
+		<h2>在线演示Demo</h2><br />
+			<h4><div>
        				<input type="button" value="insert 文本" onclick="insert_text();";/>
        				<input id="btn_new" type="button" value="新建vb文件" onclick="new_vb_doc();" />
        				<input type="button" id="btn_jq" value="打开jQuery源码" onclick="open_jquery();" />
        				<input id="btn_sw" type="button" value="切换文件" disabled="true" onclick="switch_doc();" />
-       			</div>
-    				<div style="">
-		      		<div id="d-editor">
+       			</div></h4>
+            <div id="d-editor">
 		      			<div id="d-client">
 		      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
 		      			</div>
@@ -139,19 +45,32 @@
 		      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
 		      			
 		      		</div>
-      			</div>
-    		</div>
-    		<div class="foot">
-    			<a href="http://xiaoge.me" target="_black">小葛的空间</a>
-    			|<a href="mailto:abraham1@163.com">联系开发者</a>
-    			|<a href="http://weibo.com/abeyuhang" target="_blank">关注微博</a>
-    			|<a href="https://github.com/YuhangGe/alicelex" target="_blank">AliceLex</a>
-    		</div>
-    	</div>
-    	
-    	
-      	
-       
-      
-    </body>
+			
+	</div>
+	<div id="left">		
+			<div class="titl_left">友情链接</div>
+			<div class="ug"> 		
+                <ul>
+                    <li><a href="http://xiaoge.me">小葛的空间</a></li>
+                    <li><a href="mailto:abraham1@163.com">联系开发者</a></li>
+                    <li><a href="http://weibo.com/abeyuhang">关注微博</a></li>
+                    <li><a href="https://github.com/YuhangGe/alicelex">AliceLex</a></li>
+                    <li><a href="http://software.nju.edu.cn">Software Institute</a></li>
+                    <li><a href="http://nju.edu.cn">Nanjing University</a></li>
+                </ul>
+            </div>
+		
+	</div>
+<!--content ends -->
+<!--footer begins -->
+	<div style="clear: both"></div>
+	</div>
+</div>
+<div id="footer">
+<p>Daisy Editor Demo - Design and Written By <a href="http://xiaoge.me">XiaoGe</a></p>
+<p>To Daisy, To My Love.</p>
+	</div>
+
+<!-- footer ends-->
+</body>
 </html>

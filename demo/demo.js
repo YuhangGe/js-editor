@@ -1,7 +1,7 @@
 $(function() {
 	d_editor = new Daisy._Editor({
-		width : 700,
-		height : 500,
+		width : 480,
+		height : 350,
 		theme : 'notepadplusplus'
 	});
 	$.get("readme.txt", function(data) {
