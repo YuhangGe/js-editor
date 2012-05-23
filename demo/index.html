@@ -1,76 +1,103 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Daisy Editor - Demo</title>
-<meta name="keywords" content="editor canvas javascript highlight" />
-<meta name="description" content="基于canvas元素的在线高亮代码编辑器" />
-<link href="styles.css" rel="stylesheet" type="text/css" media="screen" />
-<link rel="stylesheet" href="editor.css" type="text/css" />
- <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
-      	<script type="text/javascript" src="daisy-editor.min.js"></script>
-        <script type="text/javascript" src="demo.js"></script>
-</head>
-<body>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<title>Daisy Editor - Demo</title>
+		<meta name="keywords" content="editor canvas javascript highlight" />
+		<meta name="description" content="基于canvas元素的在线高亮代码编辑器" />
+		<link href="styles.css" rel="stylesheet" type="text/css" media="screen" />
+		<link rel="stylesheet" href="editor.css" type="text/css" />
+		<script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="daisy-editor.min.js"></script>
+		<script type="text/javascript" src="demo.js"></script>
+	</head>
+	<body>
+		<a href="https://github.com/yuhangge/daisy-editor"><img style="position: absolute; top: 8px; right: -8px; border: 0;" src="images/forkme.png" alt="Fork me on GitHub"></a>
+		<div id="content">
+			<!-- header begins -->
+			<div id="header">
+				<div id="logo">
+					<div id="logo_t">
+						<span id="logo_t2">Daisy Editor</span>
+						<br />
+						<p>
+							基于html5的canvas元素的高亮代码编辑器
+						</p>
+					</div>
+				</div>
 
-<div id="content">
-<!-- header begins -->
-<div id="header">
-  	<div id="logo"> 
-    	<div id="logo_t">
-            <span id="logo_t2">Daisy Editor</span><br />
-            <p>基于html5的canvas元素的高亮代码编辑器</p>
-        </div>
-    </div>
-   
-</div>
+			</div>
 
-<!-- header ends -->
-<!-- content begins -->
- <div id="main">
-	<div id="right">
-		<h2>在线演示Demo</h2><br />
-			<h4><div>
-       				<input type="button" value="insert 文本" onclick="insert_text();";/>
-       				<input id="btn_new" type="button" value="新建vb文件" onclick="new_vb_doc();" />
-       				<input type="button" id="btn_jq" value="打开jQuery源码" onclick="open_jquery();" />
-       				<input id="btn_sw" type="button" value="切换文件" disabled="true" onclick="switch_doc();" />
-       			</div></h4>
-            <div id="d-editor">
-		      			<div id="d-client">
-		      				<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
-		      			</div>
-		      			<textarea cols="0" rows="0" spellcheck="false" id="d-caret" ></textarea>
-		      			<div id="d-rightscroll"><div id="d-rightscroll-body"></div></div>
-		      			<div id="d-bottomscroll"><div id="d-bottomscroll-body"></div></div>
-		      			
-		      		</div>
-			
-	</div>
-	<div id="left">		
-			<div class="titl_left">友情链接</div>
-			<div class="ug"> 		
-                <ul>
-                    <li><a href="http://xiaoge.me">小葛的空间</a></li>
-                    <li><a href="mailto:abraham1@163.com">联系开发者</a></li>
-                    <li><a href="http://weibo.com/abeyuhang">关注微博</a></li>
-                    <li><a href="https://github.com/YuhangGe/alicelex">AliceLex</a></li>
-                    <li><a href="http://software.nju.edu.cn">Software Institute</a></li>
-                    <li><a href="http://nju.edu.cn">Nanjing University</a></li>
-                </ul>
-            </div>
-		
-	</div>
-<!--content ends -->
-<!--footer begins -->
-	<div style="clear: both"></div>
-	</div>
-</div>
-<div id="footer">
-<p>Daisy Editor Demo - Design and Written By <a href="http://xiaoge.me">XiaoGe</a></p>
-<p>To Daisy, To My Love.</p>
-	</div>
+			<!-- header ends -->
+			<!-- content begins -->
+			<div id="main">
+				<div id="right">
+					<h2>在线演示Demo</h2>
+					<br />
+					<h4>
+					<div>
+						<input type="button" value="insert 文本" onclick="insert_text();";/>
+						<input id="btn_new" type="button" value="新建vb文件" onclick="new_vb_doc();" />
+						<input type="button" id="btn_jq" value="打开jQuery源码" onclick="open_jquery();" />
+						<input id="btn_sw" type="button" value="切换文件" disabled="true" onclick="switch_doc();" />
+					</div></h4>
+					<div id="d-editor">
+						<div id="d-client">
+							<canvas tabindex="1" width="400" height="350" id="d-canvas"></canvas>
+						</div>
+						<textarea cols="0" rows="0" spellcheck="false" id="d-caret" ></textarea>
+						<div id="d-rightscroll">
+							<div id="d-rightscroll-body"></div>
+						</div>
+						<div id="d-bottomscroll">
+							<div id="d-bottomscroll-body"></div>
+						</div>
 
-<!-- footer ends-->
-</body>
+					</div>
+
+				</div>
+				<div id="left">
+					<div class="titl_left">
+						友情链接
+					</div>
+					<div class="ug">
+						<ul>
+							<li>
+								<a href="http://xiaoge.me">小葛的空间</a>
+							</li>
+							<li>
+								<a href="mailto:abraham1@163.com">联系开发者</a>
+							</li>
+							<li>
+								<a href="http://weibo.com/abeyuhang">关注微博</a>
+							</li>
+							<li>
+								<a href="https://github.com/YuhangGe/alicelex">AliceLex</a>
+							</li>
+							<li>
+								<a href="http://software.nju.edu.cn">Software Institute</a>
+							</li>
+							<li>
+								<a href="http://nju.edu.cn">Nanjing University</a>
+							</li>
+						</ul>
+					</div>
+
+				</div>
+				<!--content ends -->
+				<!--footer begins -->
+				<div style="clear: both"></div>
+			</div>
+		</div>
+		<div id="footer">
+			<p>
+				Daisy Editor Demo - Design and Written By <a href="http://xiaoge.me">XiaoGe</a>
+			</p>
+			<p>
+				To Daisy, To My Love.
+			</p>
+		</div>
+
+		<!-- footer ends-->
+	</body>
 </html>
