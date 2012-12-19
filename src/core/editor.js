@@ -6,17 +6,6 @@
 	 * @email   abraham1@163.com | abeyuhang@gmail.com
 	 * @weibo   http://weibo.com/abeyuhang
 	 *
-	 * 两个命中注定孤独的人，
-	 * 如果无缘走到一起，是上帝想让他们更优秀；
-	 * 如果有缘走到一起，不是不再孤独，
-	 * 是上帝让他们更加适应孤独。
-	 *
-	 * 基于HTML5的canvas元素的前端代码编辑器，目标是实现一个前端的notepad++。
-	 * This is a source code editor like Notepad++，
-	 * but it is written by Javascript，and is based on the Canvas element of HTML5.
-	 *
-	 * To Daisy, To my love.
-	 *
 	 */
 	Daisy._Editor = function(config) {
 
