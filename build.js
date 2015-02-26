@@ -48,7 +48,7 @@
 	}
 	orig_code += "\n})(Daisy,Daisy.$);";
 	
-	fs.writeFileSync("daisy-editor.js",orig_code,"utf8");
+	fs.writeFileSync("js-editor.js",orig_code,"utf8");
 	// parse code and get the initial AST
 	var ast = jsp.parse(orig_code);
 	// get a new AST with mangled names
@@ -58,6 +58,6 @@
 	// compressed code here
 	var final_code = pro.gen_code(ast);
 
-	fs.writeFileSync("daisy-editor.min.js",final_code,"utf8");
+	fs.writeFileSync("js-editor.min.js",final_code,"utf8");
 
 })();

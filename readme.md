@@ -1,4 +1,4 @@
-#Daisy Editor
+#JS Editor
 code editor with syntax highlight based on html5 canvas element, like notepad++ or other editor.
    
 online demo: [http://editor.xiaoge.me](http://editor.xiaoge.me)
@@ -10,7 +10,7 @@ online demo: [http://editor.xiaoge.me](http://editor.xiaoge.me)
 * 支持多种语言的高亮、各种颜色主题可配置（目前实现了JS和VB.net的词法分析，aptana3和notepad++的默认主题）
 
 ## Known Bugs and Todo list
-请参看根目录下的[bug_todo.md](https://github.com/YuhangGe/daisy-editor/blob/master/bugs_todo.md)文件
+请参看根目录下的[bug_todo.md](https://github.com/YuhangGe/js-editor/blob/master/bugs_todo.md)文件
 
 ## Information
 代码高亮模块的词法分析部分使用基于Javascript的词法分析器自动生成工具[AliceLex](http://github.com/YuhangGe/alicelex)生成。该工具实现了纯基于Javascript的Lex工具，是我的个人毕业设计。
